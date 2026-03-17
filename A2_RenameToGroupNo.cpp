@@ -29,12 +29,58 @@
 #include <fstream>
 #include <string>
 
+// libraries for decoration and input validation purposes
+#include <cctype>
+
 using namespace std;
 
 #define SIZE 100 //global definition to determine the size of all the array in A2
 string currentUser = "Sunny Ling Ling Ling"; //global definition with default value to determine the current user
 
 //1. Define the FUNCTION PROTOTYPE for all the listed functions
+
+// functions for decoration or input validation purposes
+
+int cinInt() {
+	string output;
+	while (true) {
+		int non_digit_count = 0;
+		cin >> output;
+		for(int i = 0; i<output.length(); i++){
+			if(!isdigit(output[i])){
+				non_digit_count++;
+			}
+		}
+		if(non_digit_count == 0){
+			return stoi(output);
+		}
+		cout << "Please enter an integer value.";
+	}
+	
+}
+double cinDouble() {
+	string output;
+	while (true) {
+		int non_digit_count = 0, decimal_count = 0;
+		cin >> output;
+		for(int i = 0; i<output.length(); i++){
+			if(!isdigit(output[i])){
+				if(output[i] == '.' && decimal_count == 0){
+					decimal_count++;
+					continue;
+				}
+				non_digit_count++;
+			}
+		}
+		if(non_digit_count == 0){
+			return stoi(output);
+		}
+		cout << "Please enter an integer value.";
+	}
+}
+string cinString() {
+
+}
 
 int loadUserInfo(string[][4]);
 void registerNewUser(string[][4], int);
@@ -44,7 +90,7 @@ int main() {
 
 	//2. Define and initialise all the necessary variables
 
-	int choice, contRL, choose, sel, cont1, sel1, cont2, cont;
+	int choice, contRL, choose, sel, cont1, sel1, cont2, cont, result; // **added result
 	string user_details[SIZE][4]; //p1
 	int num_users = 0; //p4
 
@@ -77,8 +123,8 @@ int main() {
 	
 		if (choice == 1) {
 			//5. Function call registerNewUser to register new user
-
-	
+			registerNewUser(user_details, num_users);
+				
 			cout << "Do you want to continue register/login? (1-yes, 2-no): ";
 			cin >> contRL;
 	
@@ -95,13 +141,29 @@ int main() {
 			//Prompt back to the "MAIN MENU" if meet with condition b, c and d
 			//Proceed to next stage (favourite or merchandise) if succefully login
 			//NOTE: set the global variable "currentUser" to the username that successfully login 
-	
+			result = login(user_details, num_users);
+			switch(result){
+				case -1: // wrong password
+					cout << "Username or Password incorrect!" << endl;
+					break;
+				case -2: // wrong username
+					cout << "Username or Password incorrect!" << endl;
+					cout << "If you have not registered, please register first!" << endl;
+					break;
+				case -3: // both wrong
+					cout << "If you have not registered, please register first!" << endl;
+					break;
+				default: // successfully logged in
+					currentUser = user_details[result][2];
+			}
 		}
 		else return 0;
 		
 	} while (contRL == 1);
-	//--------------------- End of Member 1 --------------------------------
 
+	cout << "END";
+	//--------------------- End of Member 1 --------------------------------
+	/*
 	//--------------------- Start of Member 2 or Member 3 --------------------------------
 	do {//do...while iteration is implemented to repeat the selection menu as below
 		system("cls");
@@ -194,7 +256,7 @@ int main() {
 		else return 0;
 
 	} while (cont == 1);
-	//--------------------- End of Member 2 or Member 3 --------------------------------
+	//--------------------- End of Member 2 or Member 3 --------------------------------*/
 	return 0;
 }
 
@@ -209,21 +271,23 @@ int main() {
 //    5) Create "userInfo.txt" if it doesn't exist yet
 int loadUserInfo(string user_details[][4]) {
 
+	int count = 0;
 	string line;
 	
-	ifstream userfile("userinfo.txt");
-	if (userfile.is_open()){
-		while ( getline(userfile,line) ) 
+	ifstream userFile("userinfo.txt");
+	if (userFile.is_open()){
+		while ( getline(userFile,line) ) 
 		{ 
-			cout << line << '\n'; 
+			user_details[count/4][count%4] = line;
+			count++;
 		} 
-
-		userfile.close();
+		userFile.close();
 	} else {
-		ofstream userfile;
-		userfile.open("userinfo.txt");
-		userfile.close();
+		ofstream userFile("userInfo.txt");
+		userFile.close();
 	}
+	
+	return ((count/4)+1);
 }
 
 //16. Function registerNewUser --> To register new user and save it to "userInfo.txt"
@@ -235,18 +299,73 @@ int loadUserInfo(string user_details[][4]) {
 //       E.g., "Sunny Ling Ling Ling" is already exist in the list, hence new user is not allowed to register
 //       using the same name.
 void registerNewUser(string user_details[][4], int num_users) {
+	string name, email, username, password;
+	int cont = 2;
+	do {
+		cout << "Name: ";
+		getline(cin, name);
+		while(true){
+			cout << "Email: ";
+			cin >> email;
+			if(email.find('@') != string::npos)
+				break;
+			cout << "Please key in the correct email!";
+		}
 
+		cout << "Username: ";
+		getline(cin, username);
+		while (true) {
+			cout << "Password (At least 8 characters (1 symbol, 1 uppercase letter, 1 number)): ";
+			getline(cin, password);
+			if (password.length() < 8) {
+				cout << "Password must be at least 8 characters!" << endl;
+			} else {
+				int symbol_count = 0, uppercase_count = 0, number_count = 0;
+			}
+		}
+
+		cout << "Confirm registration? (1-yes, 2-no): ";
+		cin >> cont;
+		if(cont == 1){
+			ofstream userFile;
+			userFile.open("userInfo.txt", ios_base::app);
+			userFile << name << "\n" << email << "\n" << username << "\n" << password << "\n";
+			userFile.close();
+		}
+	} while (cont != 1);
+	
+	return;
 }
 
 //17. Function login --> For user to login with the registered username and password
 //    Hint:
 //    The function will return a value to indicate login success or login fail   
 int login(string user_details[][4], int num_users) {
-	
+	string username, password;
+
+	cout << "Username: ";
+	getline(cin, username);
+	cout << "Password: ";
+	getline(cin, password);
+
+	for(int i=0; i<num_users; i++) {
+		if(user_details[i][2] == username) {
+			if(user_details[i][3] == password) return i; // return the index if both correct
+			else return -1; // incorrect password
+		}
+	}
+
+	for(int j=0; j<num_users; j++) {
+		if(user_details[j][3] == password) {
+			return -2; // incorrect username
+		}
+	}
+
+	return -3; // both not found
 }
 
 //--------------------- End of Member 1 --------------------------------
-
+/*
 //--------------------- Start of Member 2 --------------------------------
 //18. Function loadFavInfo --> read the favourites saved in "XXX MDInfo.txt"
 //    Hints:
@@ -372,3 +491,4 @@ void printReceipt(P3, P6, P7) {
 }
 
 //--------------------- End of Member 3 --------------------------------
+*/
