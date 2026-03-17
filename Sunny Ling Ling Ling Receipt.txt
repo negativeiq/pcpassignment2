@@ -1,0 +1,13 @@
+Receipt of Purchase
+~Item 1~
+Name: Stranger Shoes goodies bag
+Quantity: 1
+Price (per item): RM 200.00
+~Item 2~
+Name: K-pop Demon Hunters T-shirt
+Quantity: 2
+Price (per item): RM 50.00
+Total Price (All): 
+(1 * RM 200.00) + (2 * RM 50.00) = RM 300.00
+Available Credit: RM 700.00
+Remain Credit: RM 700.00 - RM 300.00 = RM 400.00
