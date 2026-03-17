@@ -86,12 +86,15 @@ int loadUserInfo(string[][4]);
 void registerNewUser(string[][4], int);
 int login(string[][4], int);
 
+void loadPurchaseInfo(string[][3], double&, int&);
+
 int main() {
 
 	//2. Define and initialise all the necessary variables
 
 	int choice, contRL, choose, sel, cont1, sel1, cont2, cont, result; // **added result
 	string user_details[SIZE][4]; //p1
+	string merch_details[SIZE][3]; //p3
 	int num_users = 0; //p4
 
 	//--------------------- Start of Member 1 --------------------------------
@@ -428,15 +431,26 @@ void deleteFavList(P2, P5) {
 //    8) If the text file exists, read the records. E.g., "Sunny Ling Ling Ling PurInfo.txt" is available and 
 //       the details are read and load into the respective parameters
 void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_merch) {
+	string line;
+	int count = -1;
 	ifstream in_user_merch(currentUser +" PurInfo.txt");
 	if (in_user_merch.is_open()){
 		while (getline(in_user_merch, line)){
-			cout << line << "\n";
+			
+			if (count == -1){
+				total_credit = stod(line);
+			}
+			else{
+				merch_details[count/3][count%3] = line;
+			}
+			count++;
 		}
+		in_user_merch.close();
 	} else {
-		ofstream out_s
+		ofstream out_user_merch(currentUser +" PurInfo.txt");
+		out_user_merch << "0" << endl;
+		out_user_merch.close();
 	}
-
 }
 
 //19. Function addItem --> add credit or add merchandise and saved to "XXX PurInfo.txt"
@@ -448,19 +462,48 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 //    *It will be better to display the credit value all the time on the screen when it is in add section
 //    *It will be better to list out all merchandise when add merchandise
 //    *Can refer to the example shown in the doc file
-void addItem(P3, P6, P7) {
-
-
+void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
+	int choice, cont = 1, confirm;
+	double temp_credit;
 	do {
 		system("cls");
 		cout << fixed << setprecision(2);
-		cout << "Current Credit: RM " << credit << endl;
+		cout << "Current Credit: RM " << total_credit << endl;
 		cout << "1. Add Credit" << endl;
 		cout << "2. Add Merchandise" << endl;
 		cout << "3. Back" << endl;
 		cout << "Choice: ";
 		cin >> choice;
 		system("cls");
+		switch(choice){
+			case 1:
+				cout << "Current Credit: RM " << total_credit << endl;
+				cout << "Credit to Add: RM " << endl;
+				cin >> temp_credit;
+				cout << "Confirm? (1-yes, 2-no): ";
+				cin >> confirm;
+				if (confirm == 1) {
+					total_credit = temp_credit;
+					cont = 1;
+				}
+				break;
+			case 2:
+				for (int i=0; i<SIZE; i++) {
+					cout << "~Item " << i+1 << "~" << endl;
+					cout << "Name: " << merch_details[i][0] << endl;
+					cout << "Quantity: " << merch_details[i][1] << endl;
+					cout << fixed << setprecision(2) << "Price (per piece): RM " << merch_details[i][2] << "\n" << endl;
+				}
+				cout << "~Add Merchandise~" << endl;
+				ofstream out_user_merch(currentUser +" PurInfo.txt", ios_base::app);
+				
+
+			case 3:
+				cont = 0;
+				break;
+			default:
+				//error checking
+		}
 
 		
 	} while (cont == 1);
