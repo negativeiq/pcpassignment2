@@ -324,6 +324,20 @@ void registerNewUser(string user_details[][4], int num_users) {
 				cout << "Password must be at least 8 characters!" << endl;
 			} else {
 				int symbol_count = 0, uppercase_count = 0, number_count = 0;
+				for(char c : password){
+					if(isdigit(c)){
+						number_count++;
+					} else if (ispunct(c)){
+						symbol_count++;
+					} else if (isupper(c)){
+						uppercase_count++;
+					}
+				}
+				if(symbol_count == 0 || uppercase_count == 0 || number_count == 0){
+					cout << "Password must have at least 1[] symbol, 1 uppercase letter, and 1 number.";
+				} else {
+					break;
+				}
 			}
 		}
 
