@@ -324,7 +324,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				cout << "Password must be at least 8 characters!" << endl;
 			} else {
 				int symbol_count = 0, uppercase_count = 0, number_count = 0;
-				for(char c : password){
+								for(char c : password){
 					if(isdigit(c)){
 						number_count++;
 					} else if (ispunct(c)){
@@ -382,7 +382,7 @@ int login(string user_details[][4], int num_users) {
 }
 
 //--------------------- End of Member 1 --------------------------------
-/*
+
 //--------------------- Start of Member 2 --------------------------------
 //18. Function loadFavInfo --> read the favourites saved in "XXX MDInfo.txt"
 //    Hints:
@@ -477,7 +477,7 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 //    *It will be better to list out all merchandise when add merchandise
 //    *Can refer to the example shown in the doc file
 void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
-	int choice, cont = 1, confirm;
+	int choice, cont1 = 1,cont2 = 1, confirm;
 	double temp_credit;
 	do {
 		system("cls");
@@ -498,7 +498,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				cin >> confirm;
 				if (confirm == 1) {
 					total_credit = temp_credit;
-					cont = 1;
+					cont1 = 1;
 				}
 				break;
 			case 2:
@@ -508,9 +508,13 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 					cout << "Quantity: " << merch_details[i][1] << endl;
 					cout << fixed << setprecision(2) << "Price (per piece): RM " << merch_details[i][2] << "\n" << endl;
 				}
-				cout << "~Add Merchandise~" << endl;
-				ofstream out_user_merch(currentUser +" PurInfo.txt", ios_base::app);
+				do {
+					cout << "~Add Merchandise~" << endl;
+					cout << "Name: ";
 				
+					ofstream userPurFile(currentUser +" PurInfo.txt", ios_base::app);
+						userPurFile << 
+				} while (cont2 == 1);
 
 			case 3:
 				cont = 0;
@@ -548,4 +552,3 @@ void printReceipt(P3, P6, P7) {
 }
 
 //--------------------- End of Member 3 --------------------------------
-*/
