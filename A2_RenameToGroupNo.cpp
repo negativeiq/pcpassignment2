@@ -83,7 +83,6 @@ double cinPrice(string message) {
 	}
 }
 
-
 int loadUserInfo(string[][4]);
 void registerNewUser(string[][4], int);
 int login(string[][4], int);
@@ -560,6 +559,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				do {
 					cout << "~Add Merchandise~" << endl;
 					cout << "Name: ";
+				
 					getline(cin, name);
 					quantity = cinInt("Quantity: ");
 					price = cinPrice("Price (per piece): RM ");
@@ -576,6 +576,8 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 			default:
 				cout << "Please enter a valid choice (1, 2, or 3)! " << endl;
 		}
+
+		
 	} while (cont == 1);
 }
 
@@ -633,7 +635,6 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		}
 	}
 }
-
 //21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
 //    A sample is given as reference; do feel free to design your own receipt
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
