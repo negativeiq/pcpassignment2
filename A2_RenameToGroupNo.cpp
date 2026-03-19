@@ -523,7 +523,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 						ofstream userPurFile(currentUser +" PurInfo.txt", ios_base::app);
 							userPurFile << name << "\n" << quantity << "\n" << price << endl;
 					}
-				} while (affirm == 2);
+				} while (affirm == 1);
 
 			case 3:
 				return;
@@ -548,12 +548,49 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 //    Tips: stoi and stod can be used. If you are using stoi with dev c++, you may face c++ 11 problem 
 //    and please refer to https://stackoverflow.com/questions/13613295/how-can-i-compile-c11-code-with-orwell-dev-c
 void payment(string merch_details[][3], double& total_credit, int& num_merch) {
-	
+	double price = 0, conf = 1, remain;
+	int count;
+	cout << "Current Credit: " << total_credit << endl;
+	do {
+		for (int i=0; i<num_merch; i++) {
+			cout << "~Item " << i+1 << "~" << endl;
+			cout << "Name: " << merch_details[i][0] << endl;
+			cout << "Quantity: " << merch_details[i][1] << endl;
+			cout << "Price (per piece): RM " << fixed << setprecision(2) << merch_details[i][2] << endl;
+			price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
+			count++;
+			cout << "Total Price (All): " << endl;
+			for (int j=0; j<count; j++) {	
+				cout << fixed << setprecision(2) << "(" << merch_details[i][1] << " * RM " << stod(merch_details[i][2]) << ") ";
+				if (j < count - 1) {
+					cout << "+ ";
+				}
+				else if (j == count) {
+					cout << "= RM " << fixed << setprecision(2) << price << endl;
+				}
+			}
+		}
+		conf = cinInt("Confirm? (1-yes, 2-no): ");
+	} while (conf == 1);
+	remain = total_credit - price;
+	if (total_credit < price) {
+		cout << "Insufficient Credit! Please top up sufficient credit. " << endl;
+		system("PAUSE");
+		return;
+	} else {
+		cout << fixed << setprecision(2);
+		cout << "Available credit: " << total_credit << endl;
+		cout << "Remaining credit: RM " << total_credit << " - RM " << price << " = RM " << remain << endl;
+		ofstream purchaseFile(currentUser + " PurInfo.txt");
+		if (purchaseFile.is_open()) {
+			purchaseFile << to_string(remain) << endl;
+		}
+	}
 }
 
 //21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
 //    A sample is given as reference; do feel free to design your own receipt
-void printReceipt(P3, P6, P7) {
+void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 
 }
 
