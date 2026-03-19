@@ -166,13 +166,13 @@ int main() {
 
 	cout << "END";
 	//--------------------- End of Member 1 --------------------------------
-	/*
+	
 	//--------------------- Start of Member 2 or Member 3 --------------------------------
 	do {//do...while iteration is implemented to repeat the selection menu as below
 		system("cls");
 
 		//7. Indicate name if user able to login
-		cout << "Name: " <<  << endl;
+		cout << "Name: " << currentUser << endl;
 
 		//Menu to handle favourite list or purchase merchandise
 		cout << "~~Welcome to NextFlip~~" << endl;
@@ -185,7 +185,7 @@ int main() {
 
 		//--------------------- Start of Member 2 --------------------------------
 		//8. if user choose favourite list
-		if () {
+		if (choose == 'a') {
 			do {
 				system("cls");
 
@@ -210,7 +210,9 @@ int main() {
 				
 
 				//11. if...else is implemented to select the function according to the user input
-				if (sel == 1)
+				if (sel == 1){
+					
+				}
 					//Function call displayFavList to display all the favourite(s)
 
 				else if (sel == 2)
@@ -226,7 +228,7 @@ int main() {
 		//--------------------- End of Member 2 --------------------------------
 		//--------------------- Start of Member 3 --------------------------------
 		//12. if user choose purchase merchandise
-		else if () {
+		else if (choose == 'b') {
 			system("cls");
 
 			do {
@@ -400,21 +402,65 @@ int login(string user_details[][4], int num_users) {
 //       "currentUser" stores the username that successfully login and can be used to create the new text file 
 //    8) If the text file exists, read the records. E.g., "Sunny Ling Ling Ling MDInfo.txt" is available and 
 //       the details are read and load into the respective parameters
-int loadFavInfo(P2, P5){
+int loadFavInfo(string favList[][6], int& numFav){ 
 
+	int count = 0;
+	string line;
+	
+	ifstream favFile(currentUser + " MDInfo.txt");
+	if (favFile.is_open()){
+		while ( getline(favFile,line) ) 
+		{ 
+			favList[count/6][count%6] = line;
+			count++;
+		}
+		favFile.close();
+
+		if (count==0){
+			return 0;
+		}
+	} else {
+		ofstream favFile(currentUser + " MDInfo.txt");
+		favFile.close();
+	}
+	
+	return ((count/6)+1);
 }
 
 //19. Function addFavList --> add favourite to the list
 //    Hints:
 //    1) P5 is a reference parameter
 //    2) Update the text file ("XXX MDInfo.txt") after add favourite
-void addFavList(P2, P5){
+void addFavList(string favList,int& numFav){
+	cout<< "Add New Favourite Drama or Movie:"<< endl;
+	cout<< "Category:";
+	getline(cin, category);
+	cout<< "Title: " ;
+	cin<< title;
+	cout<< "Year: " ;
+	cin<< year;
+	cout<< "Language: ";
+	cin<< language;
+	cout<< "Description: ";
+	getline(cin,description);
+	cout<< "Rating: ";
+	cin<< rating;
+	cout<< "Confirm add? (1-yes, 2-no): ";
+	cin<< confirmation;
+	if (confirmation==1){
+		ofstream favFile(currentUser + " MDinfo.txt");
+		favFile << category << "\n" << title << '\n'<< year << '\n' << language <<'\n'<< description << '\n' << rating << "\n";
+		favFile.close();
+	}
+	else{
+		return;
+	}
 
 }
 
 //20. Function displayFavList --> display all the favourites store in the text file ("XXX MDInfo.txt")
 //    Hints: A message pop out when there is no favourite in the list
-void displayFavList(P2, P5) {
+void displayFavList(string favList, int& numFav) {
 
 }
 
@@ -422,7 +468,7 @@ void displayFavList(P2, P5) {
 //    Hints: 
 //    1) P5 is a reference parameter
 //    2) Update the text file ("XXX MDInfo.txt") after delete favourite 
-void deleteFavList(P2, P5) {
+void deleteFavList(string favList, int& numFav) {
 
 }
 
