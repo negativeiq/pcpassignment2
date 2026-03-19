@@ -41,10 +41,11 @@ string currentUser = "Sunny Ling Ling Ling"; //global definition with default va
 
 // functions for decoration or input validation purposes
 
-int cinInt() {
+int cinInt(string message) {
 	string output;
 	while (true) {
 		int non_digit_count = 0;
+		cout << message;
 		cin >> output;
 		for(int i = 0; i<output.length(); i++){
 			if(!isdigit(output[i])){
@@ -54,14 +55,15 @@ int cinInt() {
 		if(non_digit_count == 0){
 			return stoi(output);
 		}
-		cout << "Please enter an integer value.";
+		cout << "Please enter an integer value." << endl;
 	}
 	
 }
-double cinDouble() {
+double cinPrice(string message) {
 	string output;
 	while (true) {
-		int non_digit_count = 0, decimal_count = 0;
+		int non_digit_count = 0, decimal_count = 0, decimal_place = 0;
+		cout << message;
 		cin >> output;
 		for(int i = 0; i<output.length(); i++){
 			if(!isdigit(output[i])){
@@ -70,17 +72,17 @@ double cinDouble() {
 					continue;
 				}
 				non_digit_count++;
-			}
+			} else if (decimal_count==1){
+				decimal_place++;
+			} 
 		}
-		if(non_digit_count == 0){
-			return stoi(output);
+		if(non_digit_count == 0 && decimal_place <= 2){
+			return stod(output);
 		}
-		cout << "Please enter an integer value.";
+		cout << "Please enter a valid price range within 2 decimal places." << endl;
 	}
 }
-string cinString() {
 
-}
 
 int loadUserInfo(string[][4]);
 void registerNewUser(string[][4], int);
@@ -261,7 +263,7 @@ int main() {
 		else return 0;
 
 	} while (cont == 1);
-	//--------------------- End of Member 2 or Member 3 --------------------------------*/
+	//--------------------- End of Member 2 or Member 3 --------------------------------
 	return 0;
 }
 
@@ -326,7 +328,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				cout << "Password must be at least 8 characters!" << endl;
 			} else {
 				int symbol_count = 0, uppercase_count = 0, number_count = 0;
-								for(char c : password){
+				for(char c : password){
 					if(isdigit(c)){
 						number_count++;
 					} else if (ispunct(c)){
@@ -511,6 +513,8 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 		out_user_merch << "0" << endl;
 		out_user_merch.close();
 	}
+	num_merch = (count-1)/3;
+	return;
 }
 
 //19. Function addItem --> add credit or add merchandise and saved to "XXX PurInfo.txt"
@@ -523,8 +527,9 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 //    *It will be better to list out all merchandise when add merchandise
 //    *Can refer to the example shown in the doc file
 void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
-	int choice, cont1 = 1,cont2 = 1, confirm;
-	double temp_credit;
+	int choice, cont = 1, affirm = 1, confirm, quantity;
+	double temp_credit, price;
+	string name;  
 	do {
 		system("cls");
 		cout << fixed << setprecision(2);
@@ -538,17 +543,15 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 		switch(choice){
 			case 1:
 				cout << "Current Credit: RM " << total_credit << endl;
-				cout << "Credit to Add: RM " << endl;
-				cin >> temp_credit;
-				cout << "Confirm? (1-yes, 2-no): ";
-				cin >> confirm;
+				temp_credit = cinPrice("Credit to Add: RM ");
+				confirm = cinInt("Confirm? (1-yes, 2-no): ");
 				if (confirm == 1) {
 					total_credit = temp_credit;
-					cont1 = 1;
+					cont = 1;
 				}
 				break;
 			case 2:
-				for (int i=0; i<SIZE; i++) {
+				for (int i=0; i<num_merch; i++) {
 					cout << "~Item " << i+1 << "~" << endl;
 					cout << "Name: " << merch_details[i][0] << endl;
 					cout << "Quantity: " << merch_details[i][1] << endl;
@@ -557,19 +560,22 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				do {
 					cout << "~Add Merchandise~" << endl;
 					cout << "Name: ";
-				
-					ofstream userPurFile(currentUser +" PurInfo.txt", ios_base::app);
-						userPurFile << 
-				} while (cont2 == 1);
+					getline(cin, name);
+					quantity = cinInt("Quantity: ");
+					price = cinPrice("Price (per piece): RM ");
+					affirm = cinInt("Confirm? (1-yes, 2-no): ");
+
+					if (affirm == 1) {
+						ofstream userPurFile(currentUser +" PurInfo.txt", ios_base::app);
+							userPurFile << name << "\n" << quantity << "\n" << price << endl;
+					}
+				} while (affirm == 1);
 
 			case 3:
-				cont = 0;
-				break;
+				return;
 			default:
-				//error checking
+				cout << "Please enter a valid choice (1, 2, or 3)! " << endl;
 		}
-
-		
 	} while (cont == 1);
 }
 
@@ -587,13 +593,50 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 //    *P6 and P7 are reference parameters
 //    Tips: stoi and stod can be used. If you are using stoi with dev c++, you may face c++ 11 problem 
 //    and please refer to https://stackoverflow.com/questions/13613295/how-can-i-compile-c11-code-with-orwell-dev-c
-void payment(P3, P6, P7) {
-	
+void payment(string merch_details[][3], double& total_credit, int& num_merch) {
+	double price = 0, conf = 1, remain;
+	int count;
+	cout << "Current Credit: " << total_credit << endl;
+	do {
+		for (int i=0; i<num_merch; i++) {
+			cout << "~Item " << i+1 << "~" << endl;
+			cout << "Name: " << merch_details[i][0] << endl;
+			cout << "Quantity: " << merch_details[i][1] << endl;
+			cout << "Price (per piece): RM " << fixed << setprecision(2) << merch_details[i][2] << endl;
+			price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
+			count++;
+			cout << "Total Price (All): " << endl;
+			for (int j=0; j<count; j++) {	
+				cout << fixed << setprecision(2) << "(" << merch_details[i][1] << " * RM " << stod(merch_details[i][2]) << ") ";
+				if (j < count - 1) {
+					cout << "+ ";
+				}
+				else if (j == count) {
+					cout << "= RM " << fixed << setprecision(2) << price << endl;
+				}
+			}
+		}
+		conf = cinInt("Confirm? (1-yes, 2-no): ");
+	} while (conf == 1);
+	remain = total_credit - price;
+	if (total_credit < price) {
+		cout << "Insufficient Credit! Please top up sufficient credit. " << endl;
+		system("PAUSE");
+		return;
+	} else {
+		cout << fixed << setprecision(2);
+		cout << "Available credit: " << total_credit << endl;
+		cout << "Remaining credit: RM " << total_credit << " - RM " << price << " = RM " << remain << endl;
+		ofstream purchaseFile(currentUser + " PurInfo.txt");
+		if (purchaseFile.is_open()) {
+			purchaseFile << to_string(remain) << endl;
+		}
+	}
 }
 
 //21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
 //    A sample is given as reference; do feel free to design your own receipt
-void printReceipt(P3, P6, P7) {
+void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 
 }
 
