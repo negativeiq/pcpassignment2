@@ -31,12 +31,12 @@
 
 // libraries for decoration and input validation purposes
 #include <cctype>
-#include <ctime>
+#include <chrono>
 
 using namespace std;
 
 #define SIZE 100 //global definition to determine the size of all the array in A2
-string currentUser = "Sunny Ling Ling Ling"; //global definition with default value to determine the current user
+string currentUser = "a"; //global definition with default value to determine the current user
 
 //1. Define the FUNCTION PROTOTYPE for all the listed functions
 
@@ -110,7 +110,7 @@ int main() {
 
 	//2. Define and initialise all the necessary variables
 	ofstream testFile("test.txt");
-	int choice = 0, contRL=1, sel=0, cont1=0, sel1=0, cont2=0, cont=1, result=0; // **added result
+	int choice = 0, contRL=1, sel=0, cont1=0, sel1=0, cont2=1, cont=1, result=0; // **added result
 	string choose;
 	string user_details[SIZE][4]; //p1
 	string favList[SIZE][6]; //p2
@@ -121,7 +121,7 @@ int main() {
 	double total_credit = 0.0;
 	int num_merch = 0;
 
-
+	
 	//--------------------- Start of Member 1 --------------------------------
 	//3. User Module to handle new registration and login
 	do {
@@ -262,7 +262,7 @@ int main() {
 		//12. if user choose purchase merchandise
 		else if (choose == "b") {
 			system("cls");
-
+			
 			do {
 				//13. Function call loadPurchaseInfo to load merchandise details from "XXX PurInfo.txt"
 				//    XXX is refer to the name of current user
@@ -729,6 +729,9 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		}
 		cout << fixed << setprecision(2) << "= RM " << price << endl;
 		conf = cinInt("Confirm? (1-yes, 2-no): ");
+		// do some fix ltr
+		if (conf == 2) return;
+		if (conf == 1) break;
 	} while (conf == 2);
 	remain = total_credit - price;
 	if (total_credit < price) {
@@ -753,13 +756,50 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 //21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
 //    A sample is given as reference; do feel free to design your own receipt
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
+	double total = 0;
+	auto timestamp = chrono::zoned_time{ chrono::current_zone(), chrono::system_clock::now() };
+
 	ofstream receipt(currentUser + " Receipt.txt");
 	receipt << fixed << setprecision(2);
 	receipt << "╔══════════════════════════════════════════════════════════════════════════════╗" << endl;
-	receipt << "║                              N E X T F L I P                                 ║" << endl;
+	receipt << "║                               N E X T F L I P                                ║" << endl;
 	receipt << "║                                  Group 16                                    ║" << endl;
 	receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
+	receipt << "║  Customer: " << left << setw(66) << currentUser << "║" <<endl;
+	receipt << "║  Timestamp: " << left << setw(65) << timestamp << "║" << endl;
+	receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
+	receipt << "║                                                                              ║" << endl;
+	receipt << "║  YOUR PURCHASE:                                                              ║" << endl;
+	receipt << "║  ┌────────────────────────────────────────────────────────────────────────┐  ║" << endl;
+	receipt << "║  │ QTY │ ITEM                                         │ PRICE   │ TOTAL   │  ║" << endl;
+	receipt << "║  ├────────────────────────────────────────────────────────────────────────┤  ║" << endl;
+	for (int i = 0; i < num_merch; i++) {
+		receipt << "║  │" << right << setw(4) << merch_details[i][1] << " │ "
+			<< left << setw(44) << merch_details[i][0].substr(0, 44) << " │ "
+			<< left << setw(8) << merch_details[i][2] << "│ "
+			<< left << setw(8) << fixed << setprecision(2) << (stoi(merch_details[i][1]) * stod(merch_details[i][2])) << "│  ║" << endl;
 
+		if (merch_details[i][0].length() > 44) {
+			for (int j = 1; j <= merch_details[i][0].length() / 44; j++) {
+				receipt << "║  │     │ " << left << setw(44) << merch_details[i][0].substr((j * 44), 44) << " │         │         │  ║" << endl;
+			}
+		}
+	}
+	receipt << "║  └────────────────────────────────────────────────────────────────────────┘  ║" << endl;
+	receipt << "║                                                                              ║" << endl;
+	receipt << "║  PAYMENT SUMMARY:                                                            ║" << endl;
+	receipt << "║  ┌────────────────────────────────────────────────────────────────────────┐  ║" << endl;
+	receipt << "║  │ Total Price: " << right << setw(52) << "RM " << fixed << setprecision(2) << total << "  │  ║" << endl;
+	receipt << "║  │ Available Credit: " << right << setw(44) << "RM " << fixed << setprecision(2) << total_credit << "  │  ║" << endl;
+	receipt << "║  │ Remaining Credit: " << right << setw(44) << "RM " << fixed << setprecision(2) << (total_credit - total) << "  │  ║" << endl;
+	receipt << "║  └────────────────────────────────────────────────────────────────────────┘  ║" << endl;
+	receipt << "║                                                                              ║" << endl;
+	receipt << "║  THANK YOU FOR SHOPPING WITH NEXTFLIP! :D <3                                 ║" << endl;
+	receipt << "╚══════════════════════════════════════════════════════════════════════════════╝" << endl;
+
+
+
+	return;
 }
 
 //--------------------- End of Member 3 --------------------------------
