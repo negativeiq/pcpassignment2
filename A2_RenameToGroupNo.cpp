@@ -214,7 +214,7 @@ int main() {
 
 				//11. if...else is implemented to select the function according to the user input
 				if (sel == 1){
-
+					
 				}
 					//Function call displayFavList to display all the favourite(s)
 
@@ -561,7 +561,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				do {
 					cout << "~Add Merchandise~" << endl;
 					cout << "Name: ";
-
+				
 					getline(cin, name);
 					quantity = cinInt("Quantity: ");
 					price = cinPrice("Price (per piece): RM ");
@@ -619,7 +619,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 			else if (j == count) {
 				cout << "= RM " << fixed << setprecision(2) << price << endl;
 			}
-		}
+		}	
 		conf = cinInt("Confirm? (1-yes, 2-no): ");
 	} while (conf == 1);
 	remain = total_credit - price;
