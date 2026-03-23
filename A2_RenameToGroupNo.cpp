@@ -31,6 +31,7 @@
 
 // libraries for decoration and input validation purposes
 #include <cctype>
+#include <ctime>
 
 using namespace std;
 
@@ -82,6 +83,7 @@ double cinPrice(string message) {
 		cout << "Please enter a valid price range within 2 decimal places." << endl;
 	}
 }
+
 
 int loadUserInfo(string[][4]);
 void registerNewUser(string[][4], int);
@@ -212,7 +214,7 @@ int main() {
 
 				//11. if...else is implemented to select the function according to the user input
 				if (sel == 1){
-					
+
 				}
 					//Function call displayFavList to display all the favourite(s)
 
@@ -559,7 +561,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				do {
 					cout << "~Add Merchandise~" << endl;
 					cout << "Name: ";
-				
+
 					getline(cin, name);
 					quantity = cinInt("Quantity: ");
 					price = cinPrice("Price (per piece): RM ");
@@ -608,14 +610,14 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 			price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
 			count++;
 			cout << "Total Price (All): " << endl;
-			for (int j=0; j<count; j++) {	
-				cout << fixed << setprecision(2) << "(" << merch_details[i][1] << " * RM " << stod(merch_details[i][2]) << ") ";
-				if (j < count - 1) {
-					cout << "+ ";
-				}
-				else if (j == count) {
-					cout << "= RM " << fixed << setprecision(2) << price << endl;
-				}
+		}
+		for (int j=0; j<count; j++) {	
+			cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") ";
+			if (j < count - 1) {
+				cout << "+ ";
+			}
+			else if (j == count) {
+				cout << "= RM " << fixed << setprecision(2) << price << endl;
 			}
 		}
 		conf = cinInt("Confirm? (1-yes, 2-no): ");
@@ -632,13 +634,21 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		ofstream purchaseFile(currentUser + " PurInfo.txt");
 		if (purchaseFile.is_open()) {
 			purchaseFile << to_string(remain) << endl;
+			purchaseFile.close();
 		}
 	}
 }
+
 //21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
 //    A sample is given as reference; do feel free to design your own receipt
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
-
+	ofstream receipt(currentUser + " Receipt.txt");
+	receipt << fixed << setprecision(2);
+	receipt << "╔══════════════════════════════════════════════════════════════════════════════╗" << endl;
+    receipt << "║                              N E X T F L I P                                 ║" << endl;
+    receipt << "║                           (Made by the 67 Gang)                              ║" << endl;
+    receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
+	
 }
 
 //--------------------- End of Member 3 --------------------------------
