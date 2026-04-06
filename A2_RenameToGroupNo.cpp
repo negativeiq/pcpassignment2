@@ -153,19 +153,19 @@ int main() {
 
 	//--------------------- Start of Member 2 or Member 3 --------------------------------
 	do {//do...while iteration is implemented to repeat the selection menu as below
-		system("cls");
-
 		while (true) {
 
 			//7. Indicate name if user able to login
-			cout << "Name: " << currentUser << endl;
+			system("cls");
+			printBanner(currentUser + " : Main Menu");
 
 			//Menu to handle favourite list or purchase merchandise
-			cout << "~~Welcome to NextFlip~~" << endl;
-			cout << "A. Favourite List" << endl;
-			cout << "B. Purchase Merchandise" << endl;
-			cout << "C. Exit" << endl;
-			cout << "Choice: ";
+			cout << "----------------------------" << endl;
+			cout << "| A.        Favourite List |" << endl;
+			cout << "| B.  Purchase Merchandise |" << endl;
+			cout << "| C.                  Exit |" << endl;
+			cout << "----------------------------" << endl << endl;
+			cout << "[ Choice ]: ";
 
 			getline(cin, choose);
 			for (auto& x : choose) {
@@ -184,6 +184,7 @@ int main() {
 			cont1 = 1;
 			do {
 				system("cls");
+				printBanner(currentUser + " : Favourites");
 
 				//9. Function call loadFavInfo to read favourite(s) from "XXX MDInfo.txt"
 				//   XXX is refer to the name of current user
@@ -193,8 +194,7 @@ int main() {
 				//Menu for user to select display, add or delete favourite
 
 				while (true) {
-					sel = cinInt("1. Display Favourite List\n2. Add Favourite List\n3. Delete Favourite List\n4. Back\nSelect: ");
-
+					sel = cinInt("\n-------------------------------\n| > 1. Display Favourite List |\n| > 2. Add Favourite List     |\n| > 3. Delete Favourite List  |\n| > 4. Back                   |\n-------------------------------\n\n[ Choice ]: ");
 					if (sel >= 1 && sel <= 4) break;
 					cout << "Please select an available option (1, 2, 3, 4)." << endl;
 				}
@@ -229,6 +229,7 @@ int main() {
 		//12. if user choose purchase merchandise
 		else if (choose == "b") {
 			system("cls");
+			
 			cont2 = 1;
 			do {
 				//13. Function call loadPurchaseInfo to load merchandise details from "XXX PurInfo.txt"
@@ -236,11 +237,10 @@ int main() {
 				loadPurchaseInfo(merch_details, total_credit, num_merch);
 
 				system("cls");
-
+				printBanner(currentUser + " : Purchase");
 				//Menu to choose add credit/merchandise or make payment
 				while (true) {
-					sel1 = cinInt("1. Add Credit/Merchandise\n2. Make Payment\n3. Back\nChoice: ");
-
+					sel1 = cinInt("\n-------------------------------\n| > 1. Add Credit/Merchandise |\n| > 2. Make Payment           |\n| > 3. Back                   |\n-------------------------------\n\n[ Choice ]: ");
 					if (sel1 >= 1 && sel1 <= 3) break;
 					cout << "Please select an available option (1, 2, 3)." << endl;
 				}
@@ -328,7 +328,7 @@ void printBanner(string message) {
 	cout << "|                               N E X T F L I P                                |" << endl;
 	cout << "|                                  Group 16                                    |" << endl;
 	cout << "| "<< fixed << left << setw(50) << message << " Time: " << put_time(local, "%Y-%m-%d %H:%M:%S") << " |" << endl;
-	cout << "--------------------------------------------------------------------------------" << endl;
+	cout << "--------------------------------------------------------------------------------" << endl << endl;
 }
 //--------------------- Start of Member 1 --------------------------------
 //15. Function loadUserInfo --> read all the registered users' details from "userInfo.txt"
@@ -376,9 +376,9 @@ void registerNewUser(string user_details[][4], int num_users) {
 	do {
 		while (true) {
 
-			cout << "Name: ";
+			cout << "\nName: ";
 			getline(cin, name);
-
+				
 			while (true) {
 				cout << "Email: ";
 				getline(cin, email);
@@ -439,7 +439,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 			}
 		}
 		while (true) {
-			cont = cinInt("Confirm registration? (1-yes, 2-no): ");
+			cont = cinInt("\nConfirm registration? (1-yes, 2-no): ");
 
 			if (cont == 1 || cont == 2) break;
 			cout << "Please enter a valid option (1 for yes, 2 for no)." << endl;
@@ -540,7 +540,7 @@ void addFavList(string favList[][6], int& numFav) {
 	bool valid_year;
 
 
-	cout << "Add New Favourite Drama or Movie:" << endl;
+	cout << "\nAdd New Favourite Drama or Movie:" << endl;
 	cout << "Category: ";
 	getline(cin, category);
 	cout << "Title: ";
@@ -611,10 +611,14 @@ void addFavList(string favList[][6], int& numFav) {
 //20. Function displayFavList --> display all the favourites store in the text file ("XXX MDInfo.txt")
 //    Hints: A message pop out when there is no favourite in the list
 void displayFavList(string favList[][6], int& numFav) {
-	cout << currentUser << "'s Favourites" << endl;
+	cout << "========================================" << endl;
+	cout << "    " << currentUser << "'s Favourites" << endl;
+	cout << "========================================" << endl;
 
 	for (int i = 0; i < numFav; i++) {
-		cout << "Entry " << (i + 1) << endl;
+		cout << "\n----------------------------------------" << endl;
+		cout << "    Entry " << (i + 1) << endl;
+		cout << "----------------------------------------" << endl;
 		cout << "Category:" << favList[i][0] << endl;
 		cout << "Title:" << favList[i][1] << endl;
 		cout << "Year:" << favList[i][2] << endl;
@@ -632,7 +636,7 @@ void displayFavList(string favList[][6], int& numFav) {
 //    1) P5 is a reference parameter
 //    2) Update the text file ("XXX MDInfo.txt") after delete favourite 
 void deleteFavList(string favList[][6], int& numFav) {
-	cout << currentUser << "'s Favourites" << endl;
+	cout << endl << currentUser << "'s Favourites" << endl;
 	for (int i = 0; i < numFav; i++) {
 		cout << "\n==================================" << endl;
 		cout << "    Entry:" << (i + 1) << endl;
@@ -737,16 +741,21 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 	string name, temp_credit, price;;
 	do {
 		system("cls");
+		printBanner(currentUser + " : Add Items");
 		cout << fixed << setprecision(2);
-		cout << "Current Credit: RM " << total_credit << endl;
-		cout << "1. Add Credit" << endl;
-		cout << "2. Add Merchandise" << endl;
-		cout << "3. Back" << endl;
-		cout << "Choice: ";
+		cout << "----------------------------------" << endl;
+		cout << "| Current Credit: RM " << setw(12) << left << total_credit << "|" << endl;
+		cout << "----------------------------------" << endl;
+		cout << "| > 1.                Add Credit |" << endl;
+		cout << "| > 2.           Add Merchandise |" << endl;
+		cout << "| > 3.                      Back |" << endl;
+		cout << "----------------------------------" << endl;
+		cout << "[ Choice ]: ";
 		cin >> choice;
 		system("cls");
 		switch (choice) {
 		case 1: {
+			printBanner(currentUser + " : Add Credit");
 			cout << "Current Credit: RM " << total_credit << endl;
 			while (true) {
 				temp_credit = cinPrice("Credit to Add: RM ");
@@ -769,6 +778,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 			break;
 		}
 		case 2: {
+			printBanner(currentUser + " : Add Merch");
 			for (int i = 0; i < num_merch; i++) {
 				cout << "~Item " << i + 1 << "~" << endl;
 				cout << "Name: " << merch_details[i][0] << endl;
@@ -874,25 +884,25 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 //    A sample is given as reference; do feel free to design your own receipt
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 	double total = 0;
-		time_t now = std::time(nullptr);
-		tm local_tm;
-		localtime_s(&local_tm, &now);
-		tm* local = &local_tm;
+	time_t now = std::time(nullptr);
+	tm local_tm;
+	localtime_s(&local_tm, &now);
+	tm* local = &local_tm;
 
-		ofstream receipt(currentUser + " Receipt.txt");
-		receipt << fixed << setprecision(2);
-		receipt << "╔══════════════════════════════════════════════════════════════════════════════╗" << endl;
-		receipt << "║                               N E X T F L I P                                ║" << endl;
-		receipt << "║                                  Group 16                                    ║" << endl;
-		receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
-		receipt << "║  Customer: " << left << setw(66) << currentUser << "║" << endl;
-		receipt << "║  Timestamp: " << put_time(local, "%Y-%m-%d %H:%M:%S") << "                                              ║" << endl;
-		receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
-		receipt << "║                                                                              ║" << endl;
-		receipt << "║  YOUR PURCHASE:                                                              ║" << endl;
-		receipt << "║  ┌────────────────────────────────────────────────────────────────────────┐  ║" << endl;
-		receipt << "║  │ QTY │ ITEM                                         │ PRICE   │ TOTAL   │  ║" << endl;
-		receipt << "║  ├────────────────────────────────────────────────────────────────────────┤  ║" << endl;
+	ofstream receipt(currentUser + " Receipt.txt");
+	receipt << fixed << setprecision(2);
+	receipt << "╔══════════════════════════════════════════════════════════════════════════════╗" << endl;
+	receipt << "║                               N E X T F L I P                                ║" << endl;
+	receipt << "║                                  Group 16                                    ║" << endl;
+	receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
+	receipt << "║  Customer: " << left << setw(66) << currentUser << "║" << endl;
+	receipt << "║  Timestamp: " << put_time(local, "%Y-%m-%d %H:%M:%S") << "                                              ║" << endl;
+	receipt << "╠══════════════════════════════════════════════════════════════════════════════╣" << endl;
+	receipt << "║                                                                              ║" << endl;
+	receipt << "║  YOUR PURCHASE:                                                              ║" << endl;
+	receipt << "║  ┌────────────────────────────────────────────────────────────────────────┐  ║" << endl;
+	receipt << "║  │ QTY │ ITEM                                         │ PRICE   │ TOTAL   │  ║" << endl;
+	receipt << "║  ├────────────────────────────────────────────────────────────────────────┤  ║" << endl;
 	for (int i = 0; i < num_merch; i++) {
 
 		total += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
@@ -919,8 +929,6 @@ void printReceipt(string merch_details[][3], double& total_credit, int& num_merc
 	receipt << "║                                                                              ║" << endl;
 	receipt << "║  THANK YOU FOR SHOPPING WITH NEXTFLIP! :D <3                                 ║" << endl;
 	receipt << "╚══════════════════════════════════════════════════════════════════════════════╝" << endl;
-
-
 
 	return;
 }
