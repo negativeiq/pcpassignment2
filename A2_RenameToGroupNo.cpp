@@ -1,103 +1,83 @@
-// Important notices for the A2 template:
-//A. The group will need to use this template to work on the Assignment 2 (A2)
-//B. Not allowed to change the overall structure of the template including adding additional functions or remove any existing functions
-//C. Except - adding new funtions are allowed only if it is for decorations or input validation purposes;
-//D. Need to fill in the codes including the parts indicated with numbers and its descriptions
-//E. Extra decorations can be included without interfering the provided structure
-//F. You will need to define and use the parameters accordingly (including its datatype) as described below:
-//   P1 = two dimensional array (n rows and 4 columns) to store user details (user_details)
-//	 P2 = two dimensional array (n rows and 6 columns) to store favourite(s) list
-//   P3 = two dimensional array (n rows and 3 columns) to store merchandise details
-//   P4 = parameter to store number of registered user(s) (num_users)
-//   P5 = parameter to store number of favourite(s) in the list
-//   P6 = parameter to store total credit in the account
-//   P7 = parameter to store number of merchandise
-//   *Hint: P1, P2 and P3 can be string
-//G. Please rename the parameters properly instead of using P1, P2, P3......
-//   Else, marks will be deducted.
-//H. The programme is designed with three sections and each section can be executed separately without affected
-//   by other sections.Comment out other sections if it is not related while working individually.
-//I. At the end, COMPULSORY to combine all the sections together as a complete executable program before submission.
-//J. TIPS: Make use of getline() and also cin.ignore/infile.ignore()
+// ============================================================
+//                     NEXTFLIP - Group 16
+// C++ application that allows users to:
+//   1. Register / Login
+//   2. Manage a personal Favourite Drama/Movie list
+//   3. Purchase merchandise using stored credit
+// Data is stored in text files:
+//   - userInfo.txt          : all registered users
+//   - <user> MDInfo.txt     : favourites for each user
+//   - <user> PurInfo.txt    : credit + merchandise for each user
+//   - <user> Receipt.txt    : generated payment receipt
+// ============================================================
 
-//Only these libraries (or mentioned in the lecture slides or practical) are allowed to be defined and used
-//Libraries such as #include <array>, #include <vector>, function enum, pointer (*) or others are not allowed
-//Please refer to the A2.doc for further descriptions
-//EXCEPTION: However, libraries for decoration purposes (e.g., #include <ctime>) are allowed.
+// Libraries required for the program
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <string>
 
-// libraries for decoration and input validation purposes
+// Libraries for decoration and input validation purposes
 #include <cctype>
 #include <ctime>
 #include <sstream>
 
 using namespace std;
 
-#define SIZE 100 //global definition to determine the size of all the array in A2
-string currentUser = "a"; //global definition with default value to determine the current user
+#define SIZE 100 // Global definition to determine the size of all the array
+string currentUser = "Sunny Ling Ling Ling"; // Global definition with default value to determine the current user
 
-//1. Define the FUNCTION PROTOTYPE for all the listed functions
+// Functions for decoration or input validation purposes
+string formatCurrency(double); // Formats a double to a "X.XX" string (e.g. 12.5 -> "12.50")
+int cinInt(string); // Prompts user for input and validate it as a whole integer
+string cinPrice(string); // Prompts user for input and validate it as a price (up to 2 d.p.)
+void printBanner(string); // Prints header banner with timestamp
 
-// functions for decoration or input validation purposes
-string formatCurrency(double);
-int cinInt(string);
-string cinPrice(string);
-void printBanner(string);
+// FUNCTION PROTOTYPES
 
-int loadUserInfo(string[][4]);
-void registerNewUser(string[][4], int);
-int login(string[][4], int);
+// Member 1:
+int loadUserInfo(string[][4]); // Reads all users from userInfo.txt into a two-dimensional array
+void registerNewUser(string[][4], int); // Collects new user details and appends to "userInfo.txt"
+int login(string[][4], int); // User logins... returns row index on success or negative error code
 
-int loadFavInfo(string[][6], int&);
-void addFavList(string[][6], int&);
-void displayFavList(string[][6], int&);
-void deleteFavList(string[][6], int&);
+// Member 2:
+int loadFavInfo(string[][6], int&); // Reads current user's favourites from "<user> MDInfo.txt"
+void addFavList(string[][6], int&); // Appends a new favourite entry to the file
+void displayFavList(string[][6], int&); // Prints all favourite entries
+void deleteFavList(string[][6], int&); // Removes a chosen entry and rewrites the file
 
-void loadPurchaseInfo(string[][3], double&, int&);
-void addItem(string[][3], double&, int&);
-void payment(string[][3], double&, int&);
-void printReceipt(string[][3], double&, int&);
+// Member 3:
+void loadPurchaseInfo(string[][3], double&, int&); // Reads credit balance and merchandise from "<user> PurInfo.txt"
+void addItem(string[][3], double&, int&); // Top up credit or add a merchandise item
+void payment(string[][3], double&, int&); // Makes payment that deducts total merchandise cost from credit balance
+void printReceipt(string[][3], double&, int&); // Writes a formatted receipt to "<user> Receipt.txt"
 
 int main() {
 
-	//2. Define and initialise all the necessary variables
-	int choice = 0, contRL = 1, sel = 0, cont1 = 1, sel1 = 0, cont2 = 1, cont = 1, result = 0, favExist; // **added result, favExist
+	// Define and initialise all the necessary variables
+	int choice = 0, contRL = 1, sel = 0, cont1 = 1, sel1 = 0, cont2 = 1, cont = 1, result = 0, favExist;
 	string choose;
 
-	string user_details[SIZE][4]; //p1
-	string favList[SIZE][6]; //p2
-	string merch_details[SIZE][3]; //p3
-	int num_users = 0; //p4
-	int numFav = 0; //p5
-	double total_credit = 0.0; //p6
-	int num_merch = 0; //p7
+	string user_details[SIZE][4]; // Two dimensional array to store user details 
+	// row: [name, email, username, password]
+	string favList[SIZE][6]; // Two dimensional array to store favourite(s) list 
+	// row: [category, title, year, language, description, rating]
+	string merch_details[SIZE][3]; // Two dimensional array to store merchandise details
+	// row: [name, quantity, price]
+	int num_users = 0; // Number of registered user(s)
+	int numFav = 0; // Number of favourite(s) in the list
+	double total_credit = 0.0; // Total credit in current user account
+	int num_merch = 0; // Number of merchandise in current user account
 
+	do { // Login / Register loop
 
-	//--------------------- Start of Member 1 --------------------------------
-	//3. User Module to handle new registration and login
-	do {
-		//"cls" stand for clear screen which refreshes the screen, placing the cursor on original place
-		//For more information, refer to https://www.quora.com/What-is-system-CLS-for-in-c++
 		system("cls");
 
-		//4. Function call loadUserInfo to read the registered users' details from "userInfo.txt"
-		//The function return number of registered user(s) in the record
-		num_users = loadUserInfo(user_details);
-
-		//User will key in and select one of the functions available
-		//However, current input is accepting random value from the user without evaluation 
-		//An evaluation should be carried out to ensure user only able to select 1 or 2 or 3
-		//Additional marks will be awarded to those who are able to check on the input other than numbers 
-		//such as "abc" or "1abc"
-		//Tips: isdigit and stoi can be used. If you are using stoi with dev c++, you may face c++ 11 problem 
-		//and please refer to https://stackoverflow.com/questions/13613295/how-can-i-compile-c11-code-with-orwell-dev-c
+		num_users = loadUserInfo(user_details); // Reload user data at the start of each loop
 
 		printBanner("User Login");
 
-		while (true) {
+		while (true) { // While true loop for user to input valid choice (1, 2, or 3)
 			choice = cinInt("\n----------------------------\n| > 1.   Register New User |\n| > 2.               Login |\n| > 3.                Quit |\n----------------------------\n\n[ Choice ]: ");
 
 			if (choice >= 1 && choice <= 3) break;
@@ -105,7 +85,7 @@ int main() {
 		}
 
 		if (choice == 1) {
-			//5. Function call registerNewUser to register new user
+			// Function call registerNewUser to register new user
 			registerNewUser(user_details, num_users);
 
 			while (true) {
@@ -116,46 +96,35 @@ int main() {
 			}
 		}
 		else if (choice == 2) {
-
-			//6. Function call login by returning a value for the if...else statement to handle possible conditions:
-			//a. if username and password are correct
-			//b. if username is correct but password is not correct
-			//c. if username is not correct but password is correct
-			//d. if username and password are not correct
-			//Prompt back to the "MAIN MENU" if meet with condition b, c and d
-			//Proceed to next stage (favourite or merchandise) if succefully login
-			//NOTE: set the global variable "currentUser" to the username that successfully login 
+			// User login... result holds the user's row index or a negative error code
 			result = login(user_details, num_users);
 			switch (result) {
-				case -1: // wrong password
+				case -1: // Incorrect password
 					cout << "Username or Password incorrect!" << endl;
 					break;
-				case -2: // wrong username
-					cout << "Username or Password incorrect!" << endl;
-					cout << "If you have not registered, please register first!" << endl;
-					break;
-				case -3: // both wrong
+				case -2: // Invalid username
 					cout << "Username or Password incorrect!" << endl;
 					cout << "If you have not registered, please register first!" << endl;
 					break;
-				default: // successfully logged in
+				case -3: // Users that haven't registered into the system
+					cout << "Username or Password incorrect!" << endl;
+					cout << "If you have not registered, please register first!" << endl;
+					break;
+				default: // Successful login
 					cout << "Successfully logged in!" << endl;
-					currentUser = user_details[result][2];
-					contRL = 2;
+					currentUser = user_details[result][2]; // Store the matched username globally
+					contRL = 2; // For loop breaking purposes
 			}
 			system("PAUSE");
 		}
-		else if (choice == 3) return 0;
+		else if (choice == 3) return 0; // User chooses to quit at the login screen 
 
 	} while (contRL == 1);
 
-	//--------------------- End of Member 1 --------------------------------
-
-	//--------------------- Start of Member 2 or Member 3 --------------------------------
-	do {//do...while iteration is implemented to repeat the selection menu as below
+	do { // Selection menu looping after successful login
 		while (true) {
 
-			//7. Indicate name if user able to login
+			// Indicate name if user able to login
 			system("cls");
 			printBanner(currentUser + " : Main Menu");
 
@@ -168,52 +137,41 @@ int main() {
 			cout << "[ Choice ]: ";
 
 			getline(cin, choose);
-			for (auto& x : choose) {
-				x = tolower(x);
-			}
+			for (char& x : choose) x = tolower(x); // Change user's choice input to lowercase
+			
 			if (choose == "a" || choose == "b" || choose == "c") break;
 
 			cout << " Please enter valid inputs (a, b, c)" << endl;
 		}
 		system("cls");
 
-
-		//--------------------- Start of Member 2 --------------------------------
-		//8. if user choose favourite list
+		// If user chooses favourite list
 		if (choose == "a") {
 			cont1 = 1;
 			do {
 				system("cls");
 				printBanner(currentUser + " : Favourites");
 
-				//9. Function call loadFavInfo to read favourite(s) from "XXX MDInfo.txt"
-				//   XXX is refer to the name of current user
-				//   The function will return a value indicating whether any favorites exist in the file (empty)
+				// Function call loadFavInfo to read favourite(s) from "XXX MDInfo.txt"
 				favExist = loadFavInfo(favList, numFav);
 
-				//Menu for user to select display, add or delete favourite
-
+				// Menu for user to select display, add or delete favourite
 				while (true) {
 					sel = cinInt("\n-------------------------------\n| > 1. Display Favourite List |\n| > 2. Add Favourite List     |\n| > 3. Delete Favourite List  |\n| > 4. Back                   |\n-------------------------------\n\n[ Choice ]: ");
 					if (sel >= 1 && sel <= 4) break;
 					cout << "Please select an available option (1, 2, 3, 4)." << endl;
 				}
-
-				//cin.ignore() is to ignore or clear one or more characters from the input buffer
-				//For more information, refer to https://www.tutorialspoint.com/what-is-the-use-of-cin-ignore-in-cplusplus
-
-				//10. A message will pop out to remind user no favourite in the list if 1 or 3 is selected
+				// A message will pop out to remind user no favourite is in the list if 1 or 3 is selected
 				if (favExist == 0 && (sel == 1 || sel == 3)) {
 					cout << "No favourite list is found for " << currentUser << endl;
 					system("PAUSE");
-					continue;
+					continue; // Skip to next iteration and reload the menu
 				}
 
-				//11. if...else is implemented to select the function according to the user input
+				// Select the function according to the user input
 				if (sel == 1)
 					//Function call displayFavList to display all the favourite(s)
 					displayFavList(favList, numFav);
-
 				else if (sel == 2)
 					//Function call addFavList to add favourite 
 					addFavList(favList, numFav);
@@ -224,48 +182,45 @@ int main() {
 
 			} while (cont1 == 1);
 		}
-		//--------------------- End of Member 2 --------------------------------
-		//--------------------- Start of Member 3 --------------------------------
-		//12. if user choose purchase merchandise
+
+		// If user chooses to purchase merchandise
 		else if (choose == "b") {
 			system("cls");
 			
 			cont2 = 1;
 			do {
-				//13. Function call loadPurchaseInfo to load merchandise details from "XXX PurInfo.txt"
-				//    XXX is refer to the name of current user
+				// Load merchandise details from "<user> PurInfo.txt"
 				loadPurchaseInfo(merch_details, total_credit, num_merch);
 
 				system("cls");
 				printBanner(currentUser + " : Purchase");
+
 				//Menu to choose add credit/merchandise or make payment
 				while (true) {
 					sel1 = cinInt("\n-------------------------------\n| > 1. Add Credit/Merchandise |\n| > 2. Make Payment           |\n| > 3. Back                   |\n-------------------------------\n\n[ Choice ]: ");
 					if (sel1 >= 1 && sel1 <= 3) break;
 					cout << "Please select an available option (1, 2, 3)." << endl;
 				}
-
-				//14. if...else is implemented to select the function according to the user input
-				if (sel1 == 1)
-					//Function call addItem to add credit or merchandise to the account
-					addItem(merch_details, total_credit, num_merch);
+				
+				if (sel1 == 1) // Selects the function according to the user input
+					addItem(merch_details, total_credit, num_merch); // Add credit or merchandise to the account
 				else if (sel1 == 2)
-					//Function call payment to make payment for the merchandise
-					payment(merch_details, total_credit, num_merch);
+					payment(merch_details, total_credit, num_merch); // Make payment for the merchandise
 				else
-					cont2 = 2;
-
+					cont2 = 2; // Break the loop
 			} while (cont2 == 1);
 		}
-		//--------------------- End of Member 3 --------------------------------
-		else return 0;
+		else return 0; // Option "c": exit the purchase loop
 
-	} while (cont == 1);
-	//--------------------- End of Member 2 or Member 3 --------------------------------
+	} while (cont == 1); // Loop until user chooses to exit
+
 	return 0;
 }
-// functions for decoration or error checking purposes
 
+// Functions for decoration or error checking purposes:
+
+// Converts a double to a "X.YY" string with exactly 2 decimal places, where X = the whole number, and Y = the cents
+// Example: 12.5 -> "12.50"
 string formatCurrency(double num) {
 	int whole_num = static_cast<int>(num);
 	int two_dp = static_cast<int>((num - whole_num) * 100);
@@ -273,102 +228,100 @@ string formatCurrency(double num) {
 	return (to_string(whole_num) + "." + (two_dp < 10 ? "0" : "") + to_string(two_dp));
 }
 
+// Prompts the user with 'message', reads user input
+// Rejects it if any character is non-digit. 
 int cinInt(string message) {
 	string output;
-	while (true) {
+	while (true) { // Loops until a valid whole number is entered.
 		int non_digit_count = 0;
 		cout << message;
-		cin >> output;
+		getline(cin, output);
 		for (int i = 0; i < output.length(); i++) {
 			if (!isdigit(output[i])) {
 				non_digit_count++;
 			}
 		}
 		if (non_digit_count == 0) {
-			cin.ignore();
 			return stoi(output);
 		}
 		cout << "Please enter an integer value." << endl;
 	}
 
 }
+
+// Prompts the user with 'message', reads user input as a monetary value
+// Accepts digits and at most one decimal point with up to 2 decimal places.
+// Returns the value formatted to 2 d.p. as a string (e.g. "9.90").
 string cinPrice(string message) {
 	string output;
 	while (true) {
 		int non_digit_count = 0, decimal_count = 0, decimal_place = 0;
 		cout << message;
-		cin >> output;
+		getline (cin, output);
 		for (int i = 0; i < output.length(); i++) {
 			if (!isdigit(output[i])) {
 				if (output[i] == '.' && decimal_count == 0) {
 					decimal_count++;
 					continue;
 				}
-				non_digit_count++;
+				non_digit_count++; // Any other non-digit character makes the input invalid
 			}
 			else if (decimal_count == 1) {
-				decimal_place++;
+				decimal_place++; // Count decimal places after the decimal point
 			}
 		}
 		if (non_digit_count == 0 && decimal_place <= 2) {
-			return formatCurrency(stod(output));
+			return formatCurrency(stod(output)); // Return as a standardised 2 d.p. string
 		}
 		cout << "Please enter a valid price range within 2 decimal places." << endl;
 	}
 }
 
+// Load User Interface with timestamp with 'message' being the current menu the user is in
 void printBanner(string message) {
 
 	time_t now = std::time(nullptr);
 	tm local_tm;
-	localtime_s(&local_tm, &now);
+	localtime_s(&local_tm, &now); // to get timestamp
 	tm* local = &local_tm;
 
 	cout << "--------------------------------------------------------------------------------" << endl;
+	cout << "|                                                                              |" << endl;
 	cout << "|                               N E X T F L I P                                |" << endl;
 	cout << "|                                  Group 16                                    |" << endl;
 	cout << "| "<< fixed << left << setw(50) << message << " Time: " << put_time(local, "%Y-%m-%d %H:%M:%S") << " |" << endl;
 	cout << "--------------------------------------------------------------------------------" << endl << endl;
 }
-//--------------------- Start of Member 1 --------------------------------
-//15. Function loadUserInfo --> read all the registered users' details from "userInfo.txt"
-//    and store the data into the respective parameters
-//    Hint:
-//    1) P1 is a two dimensional array with row and column ([][4])
-//    2) Row is depends on the number of users
-//    3) Columns is to store name, email, username and password
-//    4) The function will return the total number of registered user in the file
-//    5) Create "userInfo.txt" if it doesn't exist yet
+// ============================================================
+// MEMBER 1
+// ============================================================
+// Read all the registered users' details from "userInfo.txt"
 int loadUserInfo(string user_details[][4]) {
 
 	int count = 0;
 	string line;
 
 	ifstream userFile("userinfo.txt");
-	if (userFile.is_open()) {
+	if (userFile.is_open()) { 
 		while (getline(userFile, line))
 		{
+			// Each user occupies 4 lines of credentials: name, email, username, and password
+			// (count / 4) represents the user, (count % 4) represents the lines of credential
 			user_details[count / 4][count % 4] = line;
 			count++;
 		}
 		userFile.close();
 	}
 	else {
-		ofstream userFile("userInfo.txt");
+		ofstream userFile("userInfo.txt"); // Creates a new empty file 
 		userFile.close();
 	}
 
-	return (count / 4);
+	return (count / 4); // Total registered users
 }
 
-//16. Function registerNewUser --> To register new user and save it to "userInfo.txt"
-//    *P4 should be a reference parameter
-//    Things to do:
-//    1) Check whether the format of email is correct or not; E.g. @ must exists in the email
-//    2) Check whether the password is at least 8 characters (1 symbol, 1 uppercase letter, 1 number)
-//    3) Check whether the name, email or username exist in the list. 
-//       E.g., "Sunny Ling Ling Ling" is already exist in the list, hence new user is not allowed to register
-//       using the same name.
+// Collects all 4 credentials from the user and validates each of them and then appends to "userInfo.txt"
+// Sets the global currentUser to the new username to allow newly registered user to be logged in
 void registerNewUser(string user_details[][4], int num_users) {
 	string name, email, username, password;
 	bool exist;
@@ -383,7 +336,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				cout << "Email: ";
 				getline(cin, email);
 
-				if (email.find('@') != string::npos)
+				if (email.find('@') != string::npos) // Checks if email contains '@'
 					break;
 				cout << "Please key in the correct email!" << endl;
 			}
@@ -391,26 +344,25 @@ void registerNewUser(string user_details[][4], int num_users) {
 			cout << "Username: ";
 			getline(cin, username);
 			exist = false;
+			// Checks uniqueness for all 4 credentials
 			for (int i = 0; i < num_users; i++) {
 				if (user_details[i][0] == name) {
 					cout << "Please enter a different name." << endl;
-					exist = true;
-					break;
+					exist = true; break;
 				}
 				else if (user_details[i][1] == email) {
 					cout << "Please enter a different email." << endl;
-					exist = true;
-					break;
+					exist = true; break;
 				}
 				else if (user_details[i][2] == username) {
 					cout << "Please enter a different username." << endl;
-					exist = true;
-					break;
+					exist = true; break;
 				}
 			}
-			if (!exist) break;
+			if (!exist) break; // All credentials are unique
 		}
 		
+		// Password must be >= 8 characters and contain at least 1 digit, 1 symbol, and 1 uppercase letter
 		while (true) {
 			cout << "Password (At least 8 characters (1 symbol, 1 uppercase letter, 1 number)): ";
 			getline(cin, password);
@@ -420,22 +372,16 @@ void registerNewUser(string user_details[][4], int num_users) {
 			else {
 				int symbol_count = 0, uppercase_count = 0, number_count = 0;
 				for (char c : password) {
-					if (isdigit(c)) {
-						number_count++;
-					}
-					else if (ispunct(c)) {
-						symbol_count++;
-					}
-					else if (isupper(c)) {
-						uppercase_count++;
-					}
+					if (isdigit(c)) number_count++;
+					
+					else if (ispunct(c)) symbol_count++;
+					
+					else if (isupper(c)) uppercase_count++;
 				}
 				if (symbol_count == 0 || uppercase_count == 0 || number_count == 0) {
 					cout << "Password must have at least 1 symbol, 1 uppercase letter, and 1 number.";
 				}
-				else {
-					break;
-				}
+				else break;
 			}
 		}
 		while (true) {
@@ -446,21 +392,18 @@ void registerNewUser(string user_details[][4], int num_users) {
 		}
 
 		if (cont == 1) {
+			// Append validated new user's details into "userInfo.txt"
 			ofstream userFile;
 			userFile.open("userInfo.txt", ios_base::app);
 			userFile << name << "\n" << email << "\n" << username << "\n" << password << "\n";
 			userFile.close();
 		}
-	} while (cont != 1);
+	} while (cont != 1); // Restart when user chooses not to confirm registration
 
-	currentUser = username;
-
-	return;
+	currentUser = username; // Update the global session variable so newly registered user can directly log in
 }
 
-//17. Function login --> For user to login with the registered username and password
-//    Hint:
-//    The function will return a value to indicate login success or login fail   
+// Searches user_details for a matching username + password pair.
 int login(string user_details[][4], int num_users) {
 	string username, password;
 	
@@ -469,41 +412,27 @@ int login(string user_details[][4], int num_users) {
 	cout << "Password: ";
 	getline(cin, password);
 	
+	// Look for matching username
 	for (int i = 0; i < num_users; i++) {
 		if (user_details[i][2] == username) {
-			if (user_details[i][3] == password) return i;// return the index if both correct
-			else return -1; // incorrect password
+			if (user_details[i][3] == password) return i;// Return index if both correct
+			else return -1; // Incorrect password
 		}
 	}
-
+	// Look for duplicate password
 	for (int j = 0; j < num_users; j++) {
 		if (user_details[j][3] == password) {
-			return -2; // incorrect username
+			return -2; // Invalid username
 		}
 	}
 
-	return -3; // both not found
+	return -3; // No match at all
 }
 
-//--------------------- End of Member 1 --------------------------------
-
-//--------------------- Start of Member 2 --------------------------------
-//18. Function loadFavInfo --> read the favourites saved in "XXX MDInfo.txt"
-//    Hints:
-//    1) P2 is two dimensional array with rows and columns ([][6])
-//    2) Row is depends on the number of users
-//    3) Columns is to store category, title, year, language, description and rating
-//    4) P5 is a reference parameter
-//    5) The function will check whether any favorites exist in the file (it can be empty)
-//       Return a value to indicate whether it is empty
-//    6) Create a new text file (using ofstream) for current login user if the text file does not exist
-//       E.g., you will need to create a text file named "John Lee Wei Kok MDInfo.txt" for John Lee Wei Kok 
-//       since the text file does not exist. It might be the user register but did not add favourite or the user is 
-//       a new user without any record
-//    7) A global variable named "currentUser" is defined before function prototype
-//       "currentUser" stores the username that successfully login and can be used to create the new text file 
-//    8) If the text file exists, read the records. E.g., "Sunny Ling Ling Ling MDInfo.txt" is available and 
-//       the details are read and load into the respective parameters
+// ============================================================
+// MEMBER 2
+// ============================================================
+// Reads "<currentUser> MDInfo.txt" line-by-line into favList[][6].
 int loadFavInfo(string favList[][6], int& numFav) {
 
 	int count = 0;
@@ -513,27 +442,24 @@ int loadFavInfo(string favList[][6], int& numFav) {
 	if (favFile.is_open()) {
 		while (getline(favFile, line))
 		{
+			// Each entry occupies 6 lines: category, title, year, language, description, rating.
+			// (count / 6) represents the favourite's number, (count % 6) represents the lines of entry
 			favList[count / 6][count % 6] = line;
 			count++;
 		}
 		favFile.close();
-
-		if (count == 0) {
-			return 0;
-		}
+		if (count == 0) return 0; // File exists but has no content
 	}
 	else {
-		ofstream favFile(currentUser + " MDInfo.txt");
+		ofstream favFile(currentUser + " MDInfo.txt"); // Creates an empty text file
 		favFile.close();
 	}
 	numFav = (count / 6);
-	return (numFav == 0 ? 0 : 1);
+	return (numFav == 0 ? 0 : 1); // Returns 1 if at least one entry exists, 0 if the file is empty or missing.
 }
 
-//19. Function addFavList --> add favourite to the list
-//    Hints:
-//    1) P5 is a reference parameter
-//    2) Update the text file ("XXX MDInfo.txt") after add favourite
+// Prompts the user to enter details for a new favourite entry, year and rating has to be validated
+// Append all 6 details of favourites to "<currentUser> MDInfo.txt" after validation
 void addFavList(string favList[][6], int& numFav) {
 	string category, title, language, description, year, rating;
 	int confirmation;
@@ -549,6 +475,7 @@ void addFavList(string favList[][6], int& numFav) {
 		cout << "Year: ";
 		getline(cin, year);
 
+		// Validate year (digits only, 1-4 characters, and value between 1-2026)
 		if (year.length() <= 4 && year.length() >= 1) {
 			valid_year = true;
 			for (char c : year) {
@@ -566,6 +493,8 @@ void addFavList(string favList[][6], int& numFav) {
 	getline(cin, language);
 	cout << "Description: ";
 	getline(cin, description);
+
+	// Validate rating (numeric, up to 2 d.p., and value between 0 and 10)
 	while (true) {
 		cout << "Rating: ";
 		getline(cin, rating);
@@ -596,7 +525,7 @@ void addFavList(string favList[][6], int& numFav) {
 		cout << "Please select an option (1, 2)." << endl;
 	}
 
-	if (confirmation == 1) {
+	if (confirmation == 1) { // Appends the details
 		ofstream favFile(currentUser + " MDInfo.txt", ios_base::app);
 		favFile << category << "\n" << title << '\n' << year << '\n' << language << '\n' << description << '\n' << rating << "\n";
 		favFile.close();
@@ -608,8 +537,7 @@ void addFavList(string favList[][6], int& numFav) {
 	}
 }
 
-//20. Function displayFavList --> display all the favourites store in the text file ("XXX MDInfo.txt")
-//    Hints: A message pop out when there is no favourite in the list
+// Prints all favourite entries for the current user
 void displayFavList(string favList[][6], int& numFav) {
 	cout << "========================================" << endl;
 	cout << "    " << currentUser << "'s Favourites" << endl;
@@ -627,16 +555,13 @@ void displayFavList(string favList[][6], int& numFav) {
 		cout << "Rating:" << favList[i][5] << endl;
 	}
 	system("PAUSE");
-
-	return;
 }
 
-//21. Function deleteFavList --> delete selected favourite in the list
-//    Hints: 
-//    1) P5 is a reference parameter
-//    2) Update the text file ("XXX MDInfo.txt") after delete favourite 
+// Displays all entries, prompts the user to choose one by number
+// After choosing, rewrites the file excluding the selected entry
 void deleteFavList(string favList[][6], int& numFav) {
 	cout << endl << currentUser << "'s Favourites" << endl;
+	// Display all entries of favourites
 	for (int i = 0; i < numFav; i++) {
 		cout << "\n==================================" << endl;
 		cout << "    Entry:" << (i + 1) << endl;
@@ -668,6 +593,7 @@ void deleteFavList(string favList[][6], int& numFav) {
 	}
 
 	if (confirm == 1) {
+		// Overwrite the file excluding the selected favourite to delete
 		ofstream favFile(currentUser + " MDInfo.txt");
 		for (int i = 0; i < numFav; i++) {
 			if (i == (option - 1)) continue;
@@ -678,40 +604,25 @@ void deleteFavList(string favList[][6], int& numFav) {
 		cout << "Favourite " << option << ". " << favList[option][1] << " deleted!" << endl;
 		system("PAUSE");
 	}
-	else {
-		return; 
-	}
 }
 
-//--------------------- end of Member 2 --------------------------------
-
-//--------------------- Start of Member 3 --------------------------------
-//18. Function loadPurchaseInfo --> read the credit and merchandises saved in "XXX PurInfo.txt"
-//    Hints:
-//    1) P3 is two dimensional array with rows and columns ([][3])
-//    2) Row is depends on the number of users
-//    3) Columns is to store name of merchandise, quantity and price (per piece)
-//    4) P6 and P7 are reference parameters
-//    5) Create a new text file (using ofstream) for current login user if the text file does not exist
-//       E.g., you will need to create a text file named "John Lee Wei Kok PurInfo.txt" for John Lee Wei Kok 
-//       since the text file does not exist. It might be the user register but did not add credit or add merchandise 
-//       or the user is a new user without any record
-//    6) If the text file is created for the first time, credit 0 might need to add into the text file (without the merchandise)
-//    7) A global variable named "currentUser" is defined before function prototype
-//       "currentUser" stores the username that successfully login and can be used to create the new text file 
-//    8) If the text file exists, read the records. E.g., "Sunny Ling Ling Ling PurInfo.txt" is available and 
-//       the details are read and load into the respective parameters
+// ============================================================
+// MEMBER 3
+// ============================================================
+// Reads "<currentUser> PurInfo.txt" 
 void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_merch) {
 	string line;
-	int count = -1;
+	int count = -1; // Written as -1 so that the first line (index 0) is treated as the credit balance
 	ifstream in_user_merch(currentUser + " PurInfo.txt");
 	if (in_user_merch.is_open()) {
 		while (getline(in_user_merch, line)) {
 
 			if (count == -1) {
-				total_credit = stod(line);
+				total_credit = stod(line); // Holds the account's credit balance
 			}
 			else {
+				// Each merch occupies 3 lines: name, quantity, and price
+				// (count / 3) represents the merch number, (count % 3) represents the lines of merch details
 				merch_details[count / 3][count % 3] = line;
 			}
 			count++;
@@ -719,23 +630,16 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 		in_user_merch.close();
 	}
 	else {
-		ofstream out_user_merch(currentUser + " PurInfo.txt");
-		out_user_merch << "0" << endl;
+		ofstream out_user_merch(currentUser + " PurInfo.txt"); // Create empty text file if file is missing
+		out_user_merch << "0" << endl; // First line is the initial credit of 0
 		out_user_merch.close();
 	}
 	num_merch = count / 3;
-	return;
 }
 
-//19. Function addItem --> add credit or add merchandise and saved to "XXX PurInfo.txt"
-//    Things to do:
-//    1) A menu for user to choose whether to add credit or merchandise
-//    2) Update the "XXX PurInfo.txt" after add credit 
-//    3) Update the "XXX PurInfo.txt" after add merchandise
-//    *P6 and P7 are reference parameters
-//    *It will be better to display the credit value all the time on the screen when it is in add section
-//    *It will be better to list out all merchandise when add merchandise
-//    *Can refer to the example shown in the doc file
+// Secondary menu with two options:
+// 1. Add Credit – validates a positive amount, then updates the balance in the file.
+// 2. Add Merchandise – collects name, quantity, and price, then appends to the file.
 void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 	int choice, cont = 1, affirm = 2, confirm, quantity;
 	string name, temp_credit, price;;
@@ -753,10 +657,12 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 		cout << "[ Choice ]: ";
 		cin >> choice;
 		system("cls");
+
 		switch (choice) {
 		case 1: {
 			printBanner(currentUser + " : Add Credit");
 			cout << "Current Credit: RM " << total_credit << endl;
+			// Ensure user enters a positive credit amount
 			while (true) {
 				temp_credit = cinPrice("Credit to Add: RM ");
 				if (stod(temp_credit) > 0) break;
@@ -768,6 +674,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				total_credit += stod(temp_credit);
 				cont = 1;
 
+				// Rewrite the entire file change with the newly added credit amount
 				ofstream userPurFile(currentUser + " PurInfo.txt");
 				userPurFile << formatCurrency(total_credit) << endl;
 				for (int i = 0; i < num_merch; i++) {
@@ -779,6 +686,8 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 		}
 		case 2: {
 			printBanner(currentUser + " : Add Merch");
+
+			// Show existing to the user
 			for (int i = 0; i < num_merch; i++) {
 				cout << "~Item " << i + 1 << "~" << endl;
 				cout << "Name: " << merch_details[i][0] << endl;
@@ -797,11 +706,13 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				affirm = cinInt("Confirm? (1-yes, 2-no): ");
 
 				if (affirm == 1) {
+					// Store new item into merch_details array
 					merch_details[num_merch][0] = name;
 					merch_details[num_merch][1] = to_string(quantity);
 					merch_details[num_merch][2] = price;
 					num_merch++;
 
+					// Append the new item's 3 lines to the file
 					ofstream userPurFile(currentUser + " PurInfo.txt", ios_base::app);
 					userPurFile << name << "\n" << quantity << "\n" << price << endl;
 					userPurFile.close();
@@ -811,34 +722,23 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 			break;
 		}
 		case 3:
-			return;
+			return; // Go back to the purchase sub-menu
 		default:
 			cout << "Please enter a valid choice (1, 2, or 3)! " << endl;
 		}
-
-
 	} while (cont == 1);
 }
 
-//20. Function payment --> make payment for the merchandise
-//    Things to do:
-//    1) Show available credit and also all the merchandise in the list
-//    2) Display the total price of the merchandise (sum of all merchandise)
-//    3) If user confirm payment, it is required to check whether sufficient credit to pay
-//    4) A message pop out to stop the payment if insufficient credit
-//    5) Proceed if sufficient credit
-//    6) Print a receipt for the payment (can refer to the sample receipt given)
-//    7) Update the deducted credit in "XXX PurInfo.txt"
-//    8) Merchandise list should be cleared in "XXX PurInfo.txt" if payment is successfully made
-//    9) A message pop out if there is no merchandise in the list
-//    *P6 and P7 are reference parameters
-//    Tips: stoi and stod can be used. If you are using stoi with dev c++, you may face c++ 11 problem 
-//    and please refer to https://stackoverflow.com/questions/13613295/how-can-i-compile-c11-code-with-orwell-dev-c
+// Displays all merchandise items and their combined total, asks for payment confirmation,
+// then deducts the total from the user's credit balance.
+// If credit is insufficient, the transaction is aborted.
+// On success, the updated balance is saved and a receipt is generated.
 void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	double price = 0, conf = 2, remain;
 	int count = 0;
 	cout << "Current Credit: RM " << total_credit << endl;
 	do {
+		// Calculate the grand total across all merchandise items
 		for (int i = 0; i < num_merch; i++) {
 			cout << "~Item " << i + 1 << "~" << endl;
 			cout << "Name: " << merch_details[i][0] << endl;
@@ -848,40 +748,48 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 			count++;
 			cout << "Total Price (All): " << endl;
 		}
+		// Print the expanded price breakdown (quantity * unit_price + ... = total)
 		for (int j = 0; j < count; j++) {
 			cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") " << (j < (count - 1) ? "+ " : "");
 		}
 		cout << fixed << setprecision(2) << "= RM " << price << endl;
+
 		while (true) {
 			conf = cinInt("Confirm payment? (1-yes, 2-no): ");
 			if (conf == 1 || conf == 2) break;
 			cout << "Please select an option (1, 2)." << endl;
 		}
-		if (conf == 2) return;
+
+		if (conf == 2) return; // User cancel payment... no credit has been deducted
 		if (conf == 1) break;
+
 	} while (conf == 2);
-	remain = total_credit - price;
-	if (total_credit < price) {
+
+	remain = total_credit - price; // Calculate balance after payment
+
+	if (total_credit < price) { // Insufficient credit
 		cout << "Insufficient Credit! Please top up sufficient credit. " << endl;
 		system("PAUSE");
 		return;
 	}
-	else {
+	else { 
 		cout << fixed << setprecision(2);
 		cout << "Available credit: " << total_credit << endl;
 		cout << "Remaining credit: RM " << total_credit << " - RM " << price << " = RM " << remain << endl;
+
+		// Clear all merch info, with the exception of the remaining credit balance after payment
 		ofstream purchaseFile(currentUser + " PurInfo.txt");
 		if (purchaseFile.is_open()) {
 			purchaseFile << formatCurrency(remain) << endl;
 			purchaseFile.close();
 		}
-		printReceipt(merch_details, total_credit, num_merch);
+
+		printReceipt(merch_details, total_credit, num_merch); // Generate receipt
 		system("PAUSE");
 	}
 }
 
-//21. Function printReceipt --> print the receipt of purchase for the merchandise "XXX Receipt.txt"
-//    A sample is given as reference; do feel free to design your own receipt
+// Generates a formatted text receipt and saves it to "<currentUser> Receipt.txt".
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 	double total = 0;
 	time_t now = std::time(nullptr);
@@ -891,6 +799,7 @@ void printReceipt(string merch_details[][3], double& total_credit, int& num_merc
 
 	ofstream receipt(currentUser + " Receipt.txt");
 	receipt << fixed << setprecision(2);
+	// Header
 	receipt << "╔══════════════════════════════════════════════════════════════════════════════╗" << endl;
 	receipt << "║                               N E X T F L I P                                ║" << endl;
 	receipt << "║                                  Group 16                                    ║" << endl;
@@ -907,11 +816,13 @@ void printReceipt(string merch_details[][3], double& total_credit, int& num_merc
 
 		total += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
 
+		// Allignment of merch details with the itemized purchase table
 		receipt << "║  │" << right << setw(4) << merch_details[i][1] << " │ "
 			<< left << setw(44) << merch_details[i][0].substr(0, 44) << " │ "
 			<< left << setw(8) << merch_details[i][2] << "│ "
 			<< left << setw(8) << fixed << setprecision(2) << (stoi(merch_details[i][1]) * stod(merch_details[i][2])) << "│  ║" << endl;
 
+		// If the item name exceeds 44 characters, wrap the overflow onto additional rows
 		if (merch_details[i][0].length() > 44) {
 			for (int j = 1; j <= merch_details[i][0].length() / 44; j++) {
 				receipt << "║  │     │ " << left << setw(44) << merch_details[i][0].substr((j * 44), 44) << " │         │         │  ║" << endl;
@@ -929,8 +840,4 @@ void printReceipt(string merch_details[][3], double& total_credit, int& num_merc
 	receipt << "║                                                                              ║" << endl;
 	receipt << "║  THANK YOU FOR SHOPPING WITH NEXTFLIP! :D <3                                 ║" << endl;
 	receipt << "╚══════════════════════════════════════════════════════════════════════════════╝" << endl;
-
-	return;
 }
-
-//--------------------- End of Member 3 --------------------------------
