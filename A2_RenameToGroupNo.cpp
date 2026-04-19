@@ -357,7 +357,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				else if (user_details[i][2] == username) {
 					cout << "Please enter a different username." << endl;
 					exist = true; break;
-				}
+				}	
 			}
 			if (!exist) break; // All credentials are unique
 		}
@@ -737,33 +737,29 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	double price = 0, conf = 2, remain;
 	int count = 0;
 	cout << "Current Credit: RM " << total_credit << endl;
-	do {
-		// Calculate the grand total across all merchandise items
-		for (int i = 0; i < num_merch; i++) {
-			cout << "~Item " << i + 1 << "~" << endl;
-			cout << "Name: " << merch_details[i][0] << endl;
-			cout << "Quantity: " << merch_details[i][1] << endl;
-			cout << "Price (per piece): RM " << fixed << setprecision(2) << merch_details[i][2] << endl;
-			price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
-			count++;
-			cout << "Total Price (All): " << endl;
-		}
-		// Print the expanded price breakdown (quantity * unit_price + ... = total)
-		for (int j = 0; j < count; j++) {
-			cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") " << (j < (count - 1) ? "+ " : "");
-		}
-		cout << fixed << setprecision(2) << "= RM " << price << endl;
 
-		while (true) {
-			conf = cinInt("Confirm payment? (1-yes, 2-no): ");
-			if (conf == 1 || conf == 2) break;
-			cout << "Please select an option (1, 2)." << endl;
-		}
+	// Calculate the grand total across all merchandise items
+	for (int i = 0; i < num_merch; i++) {
+		cout << "~Item " << i + 1 << "~" << endl;
+		cout << "Name: " << merch_details[i][0] << endl;
+		cout << "Quantity: " << merch_details[i][1] << endl;
+		cout << "Price (per piece): RM " << fixed << setprecision(2) << merch_details[i][2] << endl;
+		price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
+		count++;
+		cout << "Total Price (All): " << endl;
+	}
+	// Print the expanded price breakdown (quantity * unit_price + ... = total)
+	for (int j = 0; j < count; j++) {
+		cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") " << (j < (count - 1) ? "+ " : "");
+	}
+	cout << fixed << setprecision(2) << "= RM " << price << endl;
 
-		if (conf == 2) return; // User cancel payment... no credit has been deducted
-		if (conf == 1) break;
-
-	} while (conf == 2);
+	while (true) {
+		conf = cinInt("Confirm payment? (1-yes, 2-no): ");
+		if (conf == 1 || conf == 2) break;
+		cout << "Please select an option (1, 2)." << endl;
+	} 
+	if (conf == 2) return; // User cancel payment... no credit has been deducted
 
 	remain = total_credit - price; // Calculate balance after payment
 
