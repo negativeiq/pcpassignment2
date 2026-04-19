@@ -642,7 +642,7 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 // 2. Add Merchandise – collects name, quantity, and price, then appends to the file.
 void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 	int choice, cont = 1, affirm = 2, confirm, quantity;
-	string name, temp_credit, price;;
+	string name, temp_credit, price;
 	do {
 		system("cls");
 		printBanner(currentUser + " : Add Items");
