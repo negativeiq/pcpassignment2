@@ -301,7 +301,7 @@ int loadUserInfo(string user_details[][4]) {
 	int count = 0;
 	string line;
 
-	ifstream userFile("userinfo.txt");
+	ifstream userFile("userInfo.txt");
 	if (userFile.is_open()) { 
 		while (getline(userFile, line))
 		{
@@ -357,7 +357,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				else if (user_details[i][2] == username) {
 					cout << "Please enter a different username." << endl;
 					exist = true; break;
-				}	
+				}
 			}
 			if (!exist) break; // All credentials are unique
 		}
@@ -737,7 +737,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	double price = 0, conf = 2, remain;
 	int count = 0;
 	cout << "Current Credit: RM " << total_credit << endl;
-
+	
 	// Calculate the grand total across all merchandise items
 	for (int i = 0; i < num_merch; i++) {
 		cout << "~Item " << i + 1 << "~" << endl;
@@ -758,7 +758,8 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		conf = cinInt("Confirm payment? (1-yes, 2-no): ");
 		if (conf == 1 || conf == 2) break;
 		cout << "Please select an option (1, 2)." << endl;
-	} 
+	}
+
 	if (conf == 2) return; // User cancel payment... no credit has been deducted
 
 	remain = total_credit - price; // Calculate balance after payment
