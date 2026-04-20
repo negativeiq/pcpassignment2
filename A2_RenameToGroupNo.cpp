@@ -532,9 +532,6 @@ void addFavList(string favList[][6], int& numFav) {
 
 		numFav++;
 	}
-	else {
-		return;
-	}
 }
 
 // Prints all favourite entries for the current user
@@ -785,7 +782,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	}
 }
 
-// Generates a formatted text receipt and saves it to "<currentUser> Receipt.txt".
+// Generates a formatted text receipt and saves it to "<currentUser> Receipt.txt". (Mostly decoration so there is out-of-topic functions)
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 	double total = 0;
 	time_t now = std::time(nullptr); // Retrieves time as number of seconds passed since 1 January 1970
