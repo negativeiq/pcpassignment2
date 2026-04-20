@@ -780,7 +780,6 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 			purchaseFile << formatCurrency(remain) << endl;
 			purchaseFile.close();
 		}
-
 		printReceipt(merch_details, total_credit, num_merch); // Generate receipt
 		system("PAUSE");
 	}
@@ -789,10 +788,10 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 // Generates a formatted text receipt and saves it to "<currentUser> Receipt.txt".
 void printReceipt(string merch_details[][3], double& total_credit, int& num_merch) {
 	double total = 0;
-	time_t now = std::time(nullptr);
-	tm local_tm;
-	localtime_s(&local_tm, &now);
-	tm* local = &local_tm;
+	time_t now = std::time(nullptr); // Retrieves time as number of seconds passed since 1 January 1970
+	tm local_tm; // Hold time information in a broken-down format
+	localtime_s(&local_tm, &now); // Converts the now variable into local time
+	tm* local = &local_tm; // Creates a pointer to local_tm structure
 
 	ofstream receipt(currentUser + " Receipt.txt");
 	receipt << fixed << setprecision(2);
