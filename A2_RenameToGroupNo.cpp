@@ -18,6 +18,8 @@
 #include <string>
 
 // Libraries for decoration and input validation purposes
+#include <cmath>
+#include <cmath>
 #include <cctype>
 #include <ctime>
 #include <sstream>
@@ -29,6 +31,7 @@ string currentUser = "Sunny Ling Ling Ling"; // Global definition with default v
 
 // Functions for decoration or input validation purposes
 string formatCurrency(double); // Formats a double to a "X.XX" string (e.g. 12.5 -> "12.50")
+static double RoundToCents(double);
 int cinInt(string); // Prompts user for input and validate it as a whole integer
 string cinPrice(string); // Prompts user for input and validate it as a price (up to 2 d.p.)
 void printBanner(string); // Prints header banner with timestamp
@@ -78,14 +81,20 @@ int main() {
 		printBanner("User Login");
 
 		while (true) { // While true loop for user to input valid choice (1, 2, or 3)
-			choice = cinInt("\n----------------------------\n| > 1.   Register New User |\n| > 2.               Login |\n| > 3.                Quit |\n----------------------------\n\n[ Choice ]: ");
+			cout << "\n----------------------------\n| > 1.   Register New User |\n| > 2.               Login |\n| > 3.                Quit |\n----------------------------" << endl << endl;
+			choice = cinInt("\n[ Choice ]: ");
 
 			if (choice >= 1 && choice <= 3) break;
+
+			system("cls");
+			printBanner("User Login");
 			cout << "Please select an option (1, 2, 3)." << endl;
 		}
+		system("cls");
 
 		if (choice == 1) {
 			// Function call registerNewUser to register new user
+			printBanner("Register New User");
 			registerNewUser(user_details, num_users);
 
 			while (true) {
@@ -96,6 +105,7 @@ int main() {
 			}
 		}
 		else if (choice == 2) {
+			printBanner("Login");
 			// User login... result holds the user's row index or a negative error code
 			result = login(user_details, num_users);
 			switch (result) {
@@ -122,12 +132,11 @@ int main() {
 	} while (contRL == 1);
 
 	do { // Selection menu looping after successful login
+
+		system("cls");
+		printBanner(currentUser + " : Main Menu"); // Indicate name if user able to login
+
 		while (true) {
-
-			// Indicate name if user able to login
-			system("cls");
-			printBanner(currentUser + " : Main Menu");
-
 			//Menu to handle favourite list or purchase merchandise
 			cout << "----------------------------" << endl;
 			cout << "| A.        Favourite List |" << endl;
@@ -140,8 +149,10 @@ int main() {
 			for (char& x : choose) x = tolower(x); // Change user's choice input to lowercase
 			
 			if (choose == "a" || choose == "b" || choose == "c") break;
-
+			system("cls");
+			printBanner(currentUser + " : Main Menu");
 			cout << " Please enter valid inputs (a, b, c)" << endl;
+
 		}
 		system("cls");
 
@@ -157,10 +168,15 @@ int main() {
 
 				// Menu for user to select display, add or delete favourite
 				while (true) {
-					sel = cinInt("\n-------------------------------\n| > 1. Display Favourite List |\n| > 2. Add Favourite List     |\n| > 3. Delete Favourite List  |\n| > 4. Back                   |\n-------------------------------\n\n[ Choice ]: ");
+					cout << "\n-------------------------------\n| > 1. Display Favourite List |\n| > 2. Add Favourite List     |\n| > 3. Delete Favourite List  |\n| > 4. Back                   |\n-------------------------------" << endl;
+					sel = cinInt("\n[Choice]: ");
 					if (sel >= 1 && sel <= 4) break;
 					cout << "Please select an available option (1, 2, 3, 4)." << endl;
+					system("PAUSE");
+					system("cls");
+					printBanner(currentUser + " : Favourites");
 				}
+				system("cls");
 				// A message will pop out to remind user no favourite is in the list if 1 or 3 is selected
 				if (favExist == 0 && (sel == 1 || sel == 3)) {
 					cout << "No favourite list is found for " << currentUser << endl;
@@ -169,15 +185,21 @@ int main() {
 				}
 
 				// Select the function according to the user input
-				if (sel == 1)
+				if (sel == 1) {
+					printBanner(currentUser + " : Display Favourites");
 					//Function call displayFavList to display all the favourite(s)
 					displayFavList(favList, numFav);
-				else if (sel == 2)
+				}
+				else if (sel == 2) {
+					printBanner(currentUser + " : Add Favourite");
 					//Function call addFavList to add favourite 
 					addFavList(favList, numFav);
-				else if (sel == 3)
+				}
+				else if (sel == 3) {
+					printBanner(currentUser + " : DeleteFavourite");
 					//Function call deleteFavList to delete favourite
 					deleteFavList(favList, numFav);
+				}
 				else cont1 = 0; //Break the loop
 
 			} while (cont1 == 1);
@@ -185,8 +207,6 @@ int main() {
 
 		// If user chooses to purchase merchandise
 		else if (choose == "b") {
-			system("cls");
-			
 			cont2 = 1;
 			do {
 				// Load merchandise details from "<user> PurInfo.txt"
@@ -197,17 +217,20 @@ int main() {
 
 				//Menu to choose add credit/merchandise or make payment
 				while (true) {
-					sel1 = cinInt("\n-------------------------------\n| > 1. Add Credit/Merchandise |\n| > 2. Make Payment           |\n| > 3. Back                   |\n-------------------------------\n\n[ Choice ]: ");
+					cout << "\n-------------------------------\n| > 1. Add Credit/Merchandise |\n| > 2. Make Payment           |\n| > 3. Back                   |\n-------------------------------" << endl;
+					sel1 = cinInt("\n[ Choice ]: ");
 					if (sel1 >= 1 && sel1 <= 3) break;
+					system("cls");
+					printBanner(currentUser + " : Purchase");
 					cout << "Please select an available option (1, 2, 3)." << endl;
 				}
-				
-				if (sel1 == 1) // Selects the function according to the user input
+				if (sel1 == 1) { // Selects the function according to the user input
 					addItem(merch_details, total_credit, num_merch); // Add credit or merchandise to the account
-				else if (sel1 == 2)
+				}
+				else if (sel1 == 2) {
 					payment(merch_details, total_credit, num_merch); // Make payment for the merchandise
-				else
-					cont2 = 2; // Break the loop
+				}
+				else cont2 = 2; // Break the loop
 			} while (cont2 == 1);
 		}
 		else return 0; // Option "c": exit the purchase loop
@@ -225,7 +248,17 @@ string formatCurrency(double num) {
 	int whole_num = static_cast<int>(num);
 	int two_dp = static_cast<int>((num - whole_num) * 100);
 
+	if (two_dp == 100) { // e.g. 9.999... rounds cents up to 100
+		whole_num++;
+		two_dp = 0;
+	}
+
 	return (to_string(whole_num) + "." + (two_dp < 10 ? "0" : "") + to_string(two_dp));
+}
+
+// Cents rounding to avoid tiny binary errors when converting datatype
+static double RoundToCents(double x) {
+	return round(x * 100.0) / 100.0;
 }
 
 // Prompts the user with 'message', reads user input
@@ -236,6 +269,10 @@ int cinInt(string message) {
 		int non_digit_count = 0;
 		cout << message;
 		getline(cin, output);
+		if (output.empty()) {
+			cout << "Please enter an integer value." << endl;
+			continue;
+		}
 		for (int i = 0; i < output.length(); i++) {
 			if (!isdigit(output[i])) {
 				non_digit_count++;
@@ -258,6 +295,10 @@ string cinPrice(string message) {
 		int non_digit_count = 0, decimal_count = 0, decimal_place = 0;
 		cout << message;
 		getline (cin, output);
+		if (output.empty()) {
+			cout << "Please enter a valid price range within 2 decimal places." << endl;
+			continue;
+		}
 		for (int i = 0; i < output.length(); i++) {
 			if (!isdigit(output[i])) {
 				if (output[i] == '.' && decimal_count == 0) {
@@ -271,7 +312,7 @@ string cinPrice(string message) {
 			}
 		}
 		if (non_digit_count == 0 && decimal_place <= 2) {
-			return formatCurrency(stod(output)); // Return as a standardised 2 d.p. string
+			return formatCurrency(RoundToCents(stod(output))); // Return as a standardised 2 d.p. string
 		}
 		cout << "Please enter a valid price range within 2 decimal places." << endl;
 	}
@@ -574,19 +615,19 @@ void deleteFavList(string favList[][6], int& numFav) {
 
 	int option, confirm;
 	while (true) {
-		option = cinInt("Enter the number of the favourite to delete (0 to cancel)");
+		option = cinInt("Enter the number of the favourite to delete (0 to cancel) ");
 		if (option == 0) {
 			cout << "Delete cancelled" << endl;
 			return;
 		}
 		if (option >= 1 && option <= numFav) break;
-		cout << "Please enter a valid entry number (between 1 and " << numFav << ", or 0 to cancel)." << endl;
+		cout << "Please enter a valid entry number (between 1 and " << numFav << ", or 0 to cancel). " << endl;
 	}
 	
 	while (true) {
-		confirm = cinInt("Are you sure you want to delete the favourite? (1 - yes, 2- no)");
+		confirm = cinInt("Are you sure you want to delete the favourite? (1 - yes, 2- no) ");
 		if (confirm == 1 || confirm == 2) break;
-		cout << "Please enter a valid option (1 for yes, 2 for no)." << endl;
+		cout << "Please enter a valid option (1 for yes, 2 for no). " << endl;
 	}
 
 	if (confirm == 1) {
@@ -598,7 +639,7 @@ void deleteFavList(string favList[][6], int& numFav) {
 		}
 		favFile.close();
 		numFav--;
-		cout << "Favourite " << option << ". " << favList[option][1] << " deleted!" << endl;
+		cout << "Favourite " << option << ". " << favList[option - 1][1] << " deleted!" << endl;
 		system("PAUSE");
 	}
 }
@@ -628,7 +669,7 @@ void loadPurchaseInfo(string merch_details[][3], double& total_credit, int& num_
 	}
 	else {
 		ofstream out_user_merch(currentUser + " PurInfo.txt"); // Create empty text file if file is missing
-		out_user_merch << "0" << endl; // First line is the initial credit of 0
+		out_user_merch << "0.00" << endl; // First line is the initial credit of 0
 		out_user_merch.close();
 	}
 	num_merch = count / 3;
@@ -651,8 +692,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 		cout << "| > 2.           Add Merchandise |" << endl;
 		cout << "| > 3.                      Back |" << endl;
 		cout << "----------------------------------" << endl;
-		cout << "[ Choice ]: ";
-		cin >> choice;
+		choice = cinInt("[ Choice ]: ");
 		system("cls");
 
 		switch (choice) {
@@ -695,7 +735,6 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				cout << "~Add Merchandise~" << endl;
 				cout << "Name: ";
 
-				cin.ignore();
 				getline(cin, name);
 
 				quantity = cinInt("Quantity: ");
@@ -722,6 +761,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 			return; // Go back to the purchase sub-menu
 		default:
 			cout << "Please enter a valid choice (1, 2, or 3)! " << endl;
+			system("PAUSE");
 		}
 	} while (cont == 1);
 }
@@ -733,8 +773,15 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	double price = 0, conf = 2, remain;
 	int count = 0;
+
+	if (num_merch == 0) {
+		cout << "There are no merch in the cart!" << endl;
+		system("PAUSE");
+		return;
+	}
+
 	cout << "Current Credit: RM " << total_credit << endl;
-	
+
 	// Calculate the grand total across all merchandise items
 	for (int i = 0; i < num_merch; i++) {
 		cout << "~Item " << i + 1 << "~" << endl;
@@ -743,14 +790,15 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		cout << "Price (per piece): RM " << fixed << setprecision(2) << merch_details[i][2] << endl;
 		price += stoi(merch_details[i][1]) * stod(merch_details[i][2]);
 		count++;
-		cout << "Total Price (All): " << endl;
+		cout << "Total Price (All): (" << stoi(merch_details[i][1]) << " * RM " << stod(merch_details[i][2]) << ") = RM " << stoi(merch_details[i][1]) * stod(merch_details[i][2]) << endl;
 	}
 	// Print the expanded price breakdown (quantity * unit_price + ... = total)
 	for (int j = 0; j < count; j++) {
 		cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") " << (j < (count - 1) ? "+ " : "");
 	}
+	
 	cout << fixed << setprecision(2) << "= RM " << price << endl;
-
+	
 	while (true) {
 		conf = cinInt("Confirm payment? (1-yes, 2-no): ");
 		if (conf == 1 || conf == 2) break;
@@ -759,7 +807,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 
 	if (conf == 2) return; // User cancel payment... no credit has been deducted
 
-	remain = total_credit - price; // Calculate balance after payment
+	remain = RoundToCents(total_credit - price); // Calculate balance after payment
 
 	if (total_credit < price) { // Insufficient credit
 		cout << "Insufficient Credit! Please top up sufficient credit. " << endl;
@@ -768,7 +816,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	}
 	else { 
 		cout << fixed << setprecision(2);
-		cout << "Available credit: " << total_credit << endl;
+		cout << "Available credit: RM " << total_credit << endl;
 		cout << "Remaining credit: RM " << total_credit << " - RM " << price << " = RM " << remain << endl;
 
 		// Clear all merch info, with the exception of the remaining credit balance after payment
