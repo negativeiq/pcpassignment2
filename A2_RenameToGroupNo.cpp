@@ -19,7 +19,6 @@
 
 // Libraries for decoration and input validation purposes
 #include <cmath>
-#include <cmath>
 #include <cctype>
 #include <ctime>
 #include <sstream>
@@ -109,21 +108,21 @@ int main() {
 			// User login... result holds the user's row index or a negative error code
 			result = login(user_details, num_users);
 			switch (result) {
-				case -1: // Incorrect password
-					cout << "Username or Password incorrect!" << endl;
-					break;
-				case -2: // Invalid username
-					cout << "Username or Password incorrect!" << endl;
-					cout << "If you have not registered, please register first!" << endl;
-					break;
-				case -3: // Users that haven't registered into the system
-					cout << "Username or Password incorrect!" << endl;
-					cout << "If you have not registered, please register first!" << endl;
-					break;
-				default: // Successful login
-					cout << "Successfully logged in!" << endl;
-					currentUser = user_details[result][2]; // Store the matched username globally
-					contRL = 2; // For loop breaking purposes
+			case -1: // Incorrect password
+				cout << "Username or Password incorrect!" << endl;
+				break;
+			case -2: // Invalid username
+				cout << "Username or Password incorrect!" << endl;
+				cout << "If you have not registered, please register first!" << endl;
+				break;
+			case -3: // Users that haven't registered into the system
+				cout << "Username or Password incorrect!" << endl;
+				cout << "If you have not registered, please register first!" << endl;
+				break;
+			default: // Successful login
+				cout << "Successfully logged in!" << endl;
+				currentUser = user_details[result][2]; // Store the matched username globally
+				contRL = 2; // For loop breaking purposes
 			}
 			system("PAUSE");
 		}
@@ -147,7 +146,7 @@ int main() {
 
 			getline(cin, choose);
 			for (char& x : choose) x = tolower(x); // Change user's choice input to lowercase
-			
+
 			if (choose == "a" || choose == "b" || choose == "c") break;
 			system("cls");
 			printBanner(currentUser + " : Main Menu");
@@ -294,7 +293,7 @@ string cinPrice(string message) {
 	while (true) {
 		int non_digit_count = 0, decimal_count = 0, decimal_place = 0;
 		cout << message;
-		getline (cin, output);
+		getline(cin, output);
 		if (output.empty()) {
 			cout << "Please enter a valid price range within 2 decimal places." << endl;
 			continue;
@@ -330,7 +329,7 @@ void printBanner(string message) {
 	cout << "|                                                                              |" << endl;
 	cout << "|                               N E X T F L I P                                |" << endl;
 	cout << "|                                  Group 16                                    |" << endl;
-	cout << "| "<< fixed << left << setw(50) << message << " Time: " << put_time(local, "%Y-%m-%d %H:%M:%S") << " |" << endl;
+	cout << "| " << fixed << left << setw(50) << message << " Time: " << put_time(local, "%Y-%m-%d %H:%M:%S") << " |" << endl;
 	cout << "--------------------------------------------------------------------------------" << endl << endl;
 }
 // ============================================================
@@ -343,7 +342,7 @@ int loadUserInfo(string user_details[][4]) {
 	string line;
 
 	ifstream userFile("userInfo.txt");
-	if (userFile.is_open()) { 
+	if (userFile.is_open()) {
 		while (getline(userFile, line))
 		{
 			// Each user occupies 4 lines of credentials: name, email, username, and password
@@ -372,7 +371,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 
 			cout << "\nName: ";
 			getline(cin, name);
-				
+
 			while (true) {
 				cout << "Email: ";
 				getline(cin, email);
@@ -402,7 +401,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 			}
 			if (!exist) break; // All credentials are unique
 		}
-		
+
 		// Password must be >= 8 characters and contain at least 1 digit, 1 symbol, and 1 uppercase letter
 		while (true) {
 			cout << "Password (At least 8 characters (1 symbol, 1 uppercase letter, 1 number)): ";
@@ -414,13 +413,13 @@ void registerNewUser(string user_details[][4], int num_users) {
 				int symbol_count = 0, uppercase_count = 0, number_count = 0;
 				for (char c : password) {
 					if (isdigit(c)) number_count++;
-					
-					else if (ispunct(c)) symbol_count++;
-					
+
+					else if (ispunct(c) || ‘ ‘) symbol_count++;
+
 					else if (isupper(c)) uppercase_count++;
 				}
 				if (symbol_count == 0 || uppercase_count == 0 || number_count == 0) {
-					cout << "Password must have at least 1 symbol, 1 uppercase letter, and 1 number.";
+					cout << "Password must have at least 1 symbol, 1 uppercase letter, and 1 number." << endl;
 				}
 				else break;
 			}
@@ -447,12 +446,12 @@ void registerNewUser(string user_details[][4], int num_users) {
 // Searches user_details for a matching username + password pair.
 int login(string user_details[][4], int num_users) {
 	string username, password;
-	
+
 	cout << "Username: ";
 	getline(cin, username);
 	cout << "Password: ";
 	getline(cin, password);
-	
+
 	// Look for matching username
 	for (int i = 0; i < num_users; i++) {
 		if (user_details[i][2] == username) {
@@ -512,7 +511,7 @@ void addFavList(string favList[][6], int& numFav) {
 	getline(cin, category);
 	cout << "Title: ";
 	getline(cin, title);
-	while(true){
+	while (true) {
 		cout << "Year: ";
 		getline(cin, year);
 
@@ -623,7 +622,7 @@ void deleteFavList(string favList[][6], int& numFav) {
 		if (option >= 1 && option <= numFav) break;
 		cout << "Please enter a valid entry number (between 1 and " << numFav << ", or 0 to cancel). " << endl;
 	}
-	
+
 	while (true) {
 		confirm = cinInt("Are you sure you want to delete the favourite? (1 - yes, 2- no) ");
 		if (confirm == 1 || confirm == 2) break;
@@ -705,7 +704,7 @@ void addItem(string merch_details[][3], double& total_credit, int& num_merch) {
 				if (stod(temp_credit) > 0) break;
 				cout << "Please enter a valid amount." << endl;
 			}
-			
+
 			confirm = cinInt("Confirm? (1-yes, 2-no): ");
 			if (confirm == 1) {
 				total_credit += stod(temp_credit);
@@ -796,9 +795,9 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 	for (int j = 0; j < count; j++) {
 		cout << fixed << setprecision(2) << "(" << merch_details[j][1] << " * RM " << stod(merch_details[j][2]) << ") " << (j < (count - 1) ? "+ " : "");
 	}
-	
+
 	cout << fixed << setprecision(2) << "= RM " << price << endl;
-	
+
 	while (true) {
 		conf = cinInt("Confirm payment? (1-yes, 2-no): ");
 		if (conf == 1 || conf == 2) break;
@@ -814,7 +813,7 @@ void payment(string merch_details[][3], double& total_credit, int& num_merch) {
 		system("PAUSE");
 		return;
 	}
-	else { 
+	else {
 		cout << fixed << setprecision(2);
 		cout << "Available credit: RM " << total_credit << endl;
 		cout << "Remaining credit: RM " << total_credit << " - RM " << price << " = RM " << remain << endl;
