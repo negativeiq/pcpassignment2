@@ -414,7 +414,7 @@ void registerNewUser(string user_details[][4], int num_users) {
 				for (char c : password) {
 					if (isdigit(c)) number_count++;
 
-					else if (ispunct(c) || ‘ ‘) symbol_count++;
+					else if (ispunct(c) || ' ') symbol_count++;
 
 					else if (isupper(c)) uppercase_count++;
 				}
